@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronLeft, CheckCircle2, ExternalLink, Image as ImageIcon, Loader2, ArrowLeft } from 'lucide-react';
+import {
+  ChevronRight, ChevronLeft, CheckCircle2, ExternalLink,
+  Image as ImageIcon, Loader2, ArrowLeft, Volume2, VolumeX, Sparkles
+} from 'lucide-react';
 import { api } from '../services/api';
 import { useProgress } from '../context/ProgressContext';
 import AviationLoader, { GridSkeleton } from '../components/shared/AviationLoader';
@@ -17,10 +20,29 @@ const vocabularyCategories = [
   { id: 'announcements', label: 'Announcements' },
 ];
 
+function speakText(text, rate = 0.88) {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = rate; // clear, natural cabin crew articulation
+  utterance.pitch = 1.0;
+  utterance.lang = 'en-US';
+
+  const voices = window.speechSynthesis.getVoices();
+  const naturalVoice = voices.find(
+    (v) => (v.name.includes('Natural') || v.name.includes('Samantha') || v.name.includes('Google') || v.name.includes('Karen') || v.lang.startsWith('en'))
+  );
+  if (naturalVoice) utterance.voice = naturalVoice;
+
+  window.speechSynthesis.speak(utterance);
+}
+
 function WordDetailView({ word, isLearned, onLearn, onNext, onPrev, hasNext, hasPrev, onBack }) {
   const [images, setImages] = useState([]);
   const [loadingImages, setLoadingImages] = useState(true);
   const [activeImgIdx, setActiveImgIdx] = useState(0);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isSpeakingExample, setIsSpeakingExample] = useState(false);
 
   const googleImagesUrl = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(word.word + ' cabin crew aircraft aviation')}`;
 
@@ -43,6 +65,19 @@ function WordDetailView({ word, isLearned, onLearn, onNext, onPrev, hasNext, has
       isMounted = false;
     };
   }, [word.id, word.word]);
+
+  const handleSpeakWord = () => {
+    setIsSpeaking(true);
+    speakText(word.word, 0.85);
+    setTimeout(() => setIsSpeaking(false), 1200);
+  };
+
+  const handleSpeakExample = () => {
+    if (!word.exampleSentence) return;
+    setIsSpeakingExample(true);
+    speakText(word.exampleSentence, 0.92);
+    setTimeout(() => setIsSpeakingExample(false), 3000);
+  };
 
   return (
     <motion.div
@@ -85,7 +120,7 @@ function WordDetailView({ word, isLearned, onLearn, onNext, onPrev, hasNext, has
 
       <div className="bg-white p-7 sm:p-9 rounded-3xl border-2 border-aerora-border shadow-sm">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Content & Meaning */}
+          {/* Left Column: Content, Pronunciation & Meaning */}
           <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
             {/* Header */}
             <div>
@@ -101,10 +136,26 @@ function WordDetailView({ word, isLearned, onLearn, onNext, onPrev, hasNext, has
                 )}
               </div>
 
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-aerora-ink font-heading mb-1">{word.word}</h2>
+              <div className="flex flex-wrap items-center gap-4 mb-2">
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-aerora-ink font-heading">{word.word}</h2>
+                {/* Pronunciator Audio Button */}
+                <button
+                  onClick={handleSpeakWord}
+                  className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold transition-all border shadow-xs ${
+                    isSpeaking
+                      ? 'bg-aerora-blue text-white border-aerora-blue scale-105 shadow-md'
+                      : 'bg-aerora-blueLight text-aerora-blue border-blue-200 hover:bg-aerora-blue hover:text-white'
+                  }`}
+                  title="Listen to crystal-clear English pronunciation"
+                >
+                  <Volume2 className={`w-4 h-4 ${isSpeaking ? 'animate-pulse text-amber-300' : ''}`} />
+                  <span>{isSpeaking ? 'Speaking...' : 'Listen 🔊'}</span>
+                </button>
+              </div>
+
               <div className="flex items-center gap-2.5 mt-1">
                 <span className="text-xs font-bold text-aerora-blue italic bg-aerora-blueLight px-2 py-0.5 rounded-md">{word.partOfSpeech}</span>
-                <span className="text-xs font-semibold text-aerora-muted">· /{word.pronunciation}/</span>
+                <span className="text-sm font-semibold text-aerora-muted">· /{word.pronunciation}/</span>
               </div>
             </div>
 
@@ -116,8 +167,17 @@ function WordDetailView({ word, isLearned, onLearn, onNext, onPrev, hasNext, has
               </div>
 
               {word.exampleSentence && (
-                <div className="border-l-4 border-aerora-blue pl-5 py-2 bg-aerora-blueLight/30 rounded-r-2xl">
-                  <p className="text-xs font-extrabold text-aerora-blue uppercase tracking-wider mb-1">In-Flight Example</p>
+                <div className="border-l-4 border-aerora-blue pl-5 py-3 bg-aerora-blueLight/30 rounded-r-2xl">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <p className="text-xs font-extrabold text-aerora-blue uppercase tracking-wider">In-Flight Example</p>
+                    <button
+                      onClick={handleSpeakExample}
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-aerora-blue hover:underline bg-white px-2.5 py-1 rounded-lg border border-blue-100 shadow-xs"
+                    >
+                      <Volume2 className={`w-3.5 h-3.5 ${isSpeakingExample ? 'animate-pulse text-amber-500' : ''}`} />
+                      <span>{isSpeakingExample ? 'Playing announcement...' : 'Listen in-flight sentence 🔊'}</span>
+                    </button>
+                  </div>
                   <p className="text-base font-medium text-aerora-ink italic leading-relaxed">"{word.exampleSentence}"</p>
                 </div>
               )}
@@ -288,7 +348,7 @@ export default function AviationEnglish() {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <p className="text-[11px] font-extrabold tracking-[0.2em] text-aerora-blue uppercase mb-2">Aviation English</p>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-aerora-ink mb-2 font-heading">Aviation Vocabulary & Visual Guide</h1>
-          <p className="text-aerora-muted text-base font-medium max-w-xl">Explore essential aviation terms with live internet visual references.</p>
+          <p className="text-aerora-muted text-base font-medium max-w-xl">Explore essential aviation terms with live internet visual references and audio pronunciations.</p>
         </motion.div>
       )}
 
@@ -355,49 +415,71 @@ export default function AviationEnglish() {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              {categoryWords.map((word, i) => {
-                const isLearned = (state.savedWords || []).includes(word.id);
+                {categoryWords.map((word, i) => {
+                  const isLearned = (state.savedWords || []).includes(word.id);
 
-                return (
-                  <motion.button
-                    key={word.id}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: Math.min(i * 0.02, 0.25) }}
-                    onClick={() => {
-                      setSelectedWord(word);
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                    className="flex items-center justify-between bg-white border-2 border-aerora-border rounded-2xl p-4 text-left hover:border-aerora-blue hover:shadow-md transition-all group"
-                  >
-                    <div className="flex-1 min-w-0 pr-2">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="text-base font-extrabold text-aerora-ink group-hover:text-aerora-blue transition-colors font-heading truncate">
-                          {word.word}
-                        </p>
-                        {isLearned && (
-                          <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                            ✓ Learned
+                  return (
+                    <motion.div
+                      key={word.id}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: Math.min(i * 0.02, 0.25) }}
+                      className="flex items-center justify-between bg-white border-2 border-aerora-border rounded-2xl p-4 text-left hover:border-aerora-blue hover:shadow-md transition-all group"
+                    >
+                      <div
+                        onClick={() => {
+                          setSelectedWord(word);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className="flex-1 min-w-0 pr-2 cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="text-base font-extrabold text-aerora-ink group-hover:text-aerora-blue transition-colors font-heading truncate">
+                            {word.word}
+                          </p>
+                          {isLearned && (
+                            <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                              ✓ Learned
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-aerora-blue italic bg-aerora-blueLight px-2 py-0.5 rounded-md">
+                            {word.partOfSpeech}
                           </span>
-                        )}
+                          <span className="text-xs font-medium text-aerora-muted truncate">
+                            /{word.pronunciation}/
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-aerora-blue italic bg-aerora-blueLight px-2 py-0.5 rounded-md">
-                          {word.partOfSpeech}
-                        </span>
-                        <span className="text-xs font-medium text-aerora-muted truncate">
-                          /{word.pronunciation}/
-                        </span>
-                      </div>
-                    </div>
 
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <ChevronRight className="w-5 h-5 text-aerora-border group-hover:text-aerora-blue group-hover:translate-x-1 transition-all" />
-                    </div>
-                  </motion.button>
-                );
-              })}
-            </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {/* Quick Pronunciation Audio Button */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            speakText(word.word, 0.85);
+                          }}
+                          className="p-2 rounded-xl bg-aerora-bg hover:bg-aerora-blueLight text-aerora-blue hover:text-aerora-blue transition-colors"
+                          title={`Listen pronunciation for ${word.word}`}
+                        >
+                          <Volume2 className="w-4 h-4" />
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            setSelectedWord(word);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }}
+                          className="p-1 text-aerora-border group-hover:text-aerora-blue group-hover:translate-x-1 transition-all"
+                        >
+                          <ChevronRight className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
             )}
           </div>
         </div>
