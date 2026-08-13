@@ -367,9 +367,9 @@ export default function AviationEnglish() {
           </div>
         </div>
 
-        {/* Right Side Detail Panel (Sticky on Desktop) */}
-        <div className="lg:w-[420px] xl:w-[450px] flex-shrink-0">
-          <div className="lg:sticky lg:top-6">
+        {/* Right Side Detail Panel (Sticky & Independently Scrollable) */}
+        <div className="lg:w-[440px] xl:w-[470px] flex-shrink-0">
+          <div className="lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:overscroll-contain pr-1 pb-8">
             {selectedWord ? (
               <AnimatePresence mode="wait">
                 <motion.div
