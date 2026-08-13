@@ -223,7 +223,6 @@ function WordDetailPanel({ word, isLearned, onLearn, onNext, onPrev, hasNext, ha
 export default function AviationEnglish() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedWord, setSelectedWord] = useState(null);
-  const [search, setSearch] = useState('');
   const [vocabulary, setVocabulary] = useState([]);
   const { state, dispatch } = useProgress();
 
@@ -239,66 +238,40 @@ export default function AviationEnglish() {
     loadVocab();
   }, []);
 
-  const filteredWords = vocabulary.filter((w) => {
-    const matchCategory = activeCategory === 'all' || w.category === activeCategory;
-    const matchSearch = search.trim()
-      ? w.word.toLowerCase().includes(search.toLowerCase()) ||
-        w.definition.toLowerCase().includes(search.toLowerCase()) ||
-        (w.relatedWords && w.relatedWords.some((r) => r.toLowerCase().includes(search.toLowerCase())))
-      : true;
-    return matchCategory && matchSearch;
-  });
+  const categoryWords = activeCategory === 'all'
+    ? vocabulary
+    : vocabulary.filter((w) => w.category === activeCategory);
 
-  const selectedIdx = filteredWords.findIndex((w) => w.id === selectedWord?.id);
+  const selectedIdx = categoryWords.findIndex((w) => w.id === selectedWord?.id);
 
   const handleLearn = (wordId) => {
     dispatch({ type: 'LEARN_WORD', wordId });
-    if (selectedIdx >= 0 && selectedIdx < filteredWords.length - 1) {
-      setSelectedWord(filteredWords[selectedIdx + 1]);
-    } else if (filteredWords.length > 0) {
-      setSelectedWord(filteredWords[0]);
+    if (selectedIdx >= 0 && selectedIdx < categoryWords.length - 1) {
+      setSelectedWord(categoryWords[selectedIdx + 1]);
+    } else if (categoryWords.length > 0) {
+      setSelectedWord(categoryWords[0]);
     }
   };
 
   const handleNext = () => {
-    if (selectedIdx >= 0 && selectedIdx < filteredWords.length - 1) {
-      setSelectedWord(filteredWords[selectedIdx + 1]);
+    if (selectedIdx >= 0 && selectedIdx < categoryWords.length - 1) {
+      setSelectedWord(categoryWords[selectedIdx + 1]);
     }
   };
 
   const handlePrev = () => {
     if (selectedIdx > 0) {
-      setSelectedWord(filteredWords[selectedIdx - 1]);
+      setSelectedWord(categoryWords[selectedIdx - 1]);
     }
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
         <p className="text-[11px] font-extrabold tracking-[0.2em] text-aerora-blue uppercase mb-2">Aviation English</p>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-aerora-ink mb-2 font-heading">Aviation Vocabulary & Visual Guide</h1>
-        <p className="text-aerora-muted text-base font-medium mb-8 max-w-xl">Explore essential aviation terms with live internet visual references.</p>
+        <p className="text-aerora-muted text-base font-medium max-w-xl">Explore essential aviation terms with live internet visual references.</p>
       </motion.div>
-
-      {/* Search Filter Bar */}
-      <div className="relative mb-8 max-w-2xl">
-        <Search className="w-5 h-5 text-aerora-muted absolute left-4 top-1/2 -translate-y-1/2" />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search any aviation term, equipment, definition, or keyword..."
-          className="w-full bg-white border-2 border-aerora-border rounded-2xl pl-12 pr-10 py-3.5 text-sm font-semibold text-aerora-ink placeholder-aerora-muted/70 focus:outline-none focus:border-aerora-blue shadow-sm transition-colors"
-        />
-        {search && (
-          <button
-            onClick={() => setSearch('')}
-            className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-aerora-muted hover:text-aerora-ink"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        )}
-      </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Sidebar Categories */}
@@ -340,73 +313,58 @@ export default function AviationEnglish() {
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-4">
             <p className="text-xs font-bold text-aerora-muted uppercase tracking-wider">
-              {filteredWords.length} terms {activeCategory !== 'all' ? `in ${vocabularyCategories.find(c => c.id === activeCategory)?.label}` : ''}
+              {categoryWords.length} terms {activeCategory !== 'all' ? `in ${vocabularyCategories.find(c => c.id === activeCategory)?.label}` : ''}
             </p>
-            {search && (
-              <button onClick={() => setSearch('')} className="text-xs font-bold text-aerora-blue hover:underline">
-                Clear Search
-              </button>
-            )}
           </div>
 
-          {filteredWords.length === 0 ? (
-            <div className="bg-white rounded-2xl p-10 text-center border-2 border-aerora-border">
-              <p className="text-base font-bold text-aerora-ink mb-1">No terms found matching "{search}"</p>
-              <p className="text-xs font-medium text-aerora-muted mb-4">Try searching for words like "galley", "apron", "vest", or "engine".</p>
-              <button onClick={() => { setSearch(''); setActiveCategory('all'); }} className="px-4 py-2 bg-aerora-blue text-white rounded-xl text-xs font-bold">
-                View All Terms
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-2.5">
-              {filteredWords.map((word, i) => {
-                const isLearned = (state.savedWords || []).includes(word.id);
-                const isSelected = selectedWord?.id === word.id;
+          <div className="space-y-2.5">
+            {categoryWords.map((word, i) => {
+              const isLearned = (state.savedWords || []).includes(word.id);
+              const isSelected = selectedWord?.id === word.id;
 
-                return (
-                  <motion.button
-                    key={word.id}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: Math.min(i * 0.015, 0.2) }}
-                    onClick={() => setSelectedWord(word)}
-                    className={`w-full flex items-center justify-between rounded-2xl p-4 text-left transition-all group border-2 ${
-                      isSelected
-                        ? 'bg-aerora-blueLight/50 border-aerora-blue shadow-sm'
-                        : 'bg-white border-aerora-border hover:border-aerora-blue/50 hover:shadow-xs'
-                    }`}
-                  >
-                    <div className="flex-1 min-w-0 pr-3">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className={`text-base font-extrabold font-heading truncate transition-colors ${
-                          isSelected ? 'text-aerora-blue' : 'text-aerora-ink group-hover:text-aerora-blue'
-                        }`}>
-                          {word.word}
-                        </p>
-                        {isLearned && (
-                          <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                            ✓ Learned
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs font-medium text-aerora-muted line-clamp-1">
-                        {word.definition}
+              return (
+                <motion.button
+                  key={word.id}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: Math.min(i * 0.015, 0.2) }}
+                  onClick={() => setSelectedWord(word)}
+                  className={`w-full flex items-center justify-between rounded-2xl p-4 text-left transition-all group border-2 ${
+                    isSelected
+                      ? 'bg-aerora-blueLight/50 border-aerora-blue shadow-sm'
+                      : 'bg-white border-aerora-border hover:border-aerora-blue/50 hover:shadow-xs'
+                  }`}
+                >
+                  <div className="flex-1 min-w-0 pr-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className={`text-base font-extrabold font-heading truncate transition-colors ${
+                        isSelected ? 'text-aerora-blue' : 'text-aerora-ink group-hover:text-aerora-blue'
+                      }`}>
+                        {word.word}
                       </p>
+                      {isLearned && (
+                        <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                          ✓ Learned
+                        </span>
+                      )}
                     </div>
+                    <p className="text-xs font-medium text-aerora-muted line-clamp-1">
+                      {word.definition}
+                    </p>
+                  </div>
 
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className="text-[10px] font-bold text-aerora-blue italic bg-aerora-blueLight px-2 py-0.5 rounded">
-                        {word.partOfSpeech}
-                      </span>
-                      <ChevronRight className={`w-4 h-4 transition-all ${
-                        isSelected ? 'text-aerora-blue translate-x-1' : 'text-aerora-border group-hover:text-aerora-blue'
-                      }`} />
-                    </div>
-                  </motion.button>
-                );
-              })}
-            </div>
-          )}
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className="text-[10px] font-bold text-aerora-blue italic bg-aerora-blueLight px-2 py-0.5 rounded">
+                      {word.partOfSpeech}
+                    </span>
+                    <ChevronRight className={`w-4 h-4 transition-all ${
+                      isSelected ? 'text-aerora-blue translate-x-1' : 'text-aerora-border group-hover:text-aerora-blue'
+                    }`} />
+                  </div>
+                </motion.button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Right Side Detail Panel (Sticky on Desktop) */}
@@ -427,7 +385,7 @@ export default function AviationEnglish() {
                     onLearn={handleLearn}
                     onNext={handleNext}
                     onPrev={handlePrev}
-                    hasNext={selectedIdx < filteredWords.length - 1}
+                    hasNext={selectedIdx < categoryWords.length - 1}
                     hasPrev={selectedIdx > 0}
                     onClose={() => setSelectedWord(null)}
                   />
