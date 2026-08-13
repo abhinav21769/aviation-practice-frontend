@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bookmark, BookmarkCheck, ChevronRight, Search, X, Sparkles, BookOpen, Volume2 } from 'lucide-react';
+import { Bookmark, BookmarkCheck, ChevronRight, Search, X, BookOpen, ExternalLink, Sparkles } from 'lucide-react';
 import { api } from '../services/api';
 import { useProgress } from '../context/ProgressContext';
 
@@ -16,124 +16,21 @@ const vocabularyCategories = [
   { id: 'announcements', label: 'Announcements' },
 ];
 
-const specificTermImages = {
-  // Aircraft
-  'Fuselage': 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=800&q=80',
-  'Jet Engine': 'https://images.unsplash.com/photo-1583073030863-74450d26bd5b?auto=format&fit=crop&w=800&q=80',
-  'Cockpit': 'https://images.unsplash.com/photo-1517976487507-579fb364c7da?auto=format&fit=crop&w=800&q=80',
-  'Landing Gear': 'https://images.unsplash.com/photo-1559087867-ce4c91325525?auto=format&fit=crop&w=800&q=80',
-  'Winglet': 'https://images.unsplash.com/photo-1508873696983-2df5293cb32b?auto=format&fit=crop&w=800&q=80',
-  'Empennage': 'https://images.unsplash.com/photo-1520437358207-323b43b50729?auto=format&fit=crop&w=800&q=80',
-  'Radome': 'https://images.unsplash.com/photo-1542296332-2e4473faf563?auto=format&fit=crop&w=800&q=80',
-  'Flaps': 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80',
-  'APU': 'https://images.unsplash.com/photo-1519074069444-1ba4fff16def?auto=format&fit=crop&w=800&q=80',
-
-  // Airport
-  'Apron': 'https://images.unsplash.com/photo-1530521954074-e64f6810b32d?auto=format&fit=crop&w=800&q=80',
-  'Jetway': 'https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?auto=format&fit=crop&w=800&q=80',
-  'Terminal': 'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=800&q=80',
-  'Runway': 'https://images.unsplash.com/photo-1508873696983-2df5293cb32b?auto=format&fit=crop&w=800&q=80',
-  'Taxiway': 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=800&q=80',
-  'Control Tower': 'https://images.unsplash.com/photo-1569154941061-e231b4725ef1?auto=format&fit=crop&w=800&q=80',
-  'Boarding Gate': 'https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?auto=format&fit=crop&w=800&q=80',
-
-  // Cabin
-  'Galley': 'https://images.unsplash.com/photo-1569154941061-e231b4725ef1?auto=format&fit=crop&w=800&q=80',
-  'Jumpseat': 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80',
-  'Overhead Bin': 'https://images.unsplash.com/photo-1569154941061-e231b4725ef1?auto=format&fit=crop&w=800&q=80',
-  'Trolley': 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80',
-  'Bulkhead': 'https://images.unsplash.com/photo-1569154941061-e231b4725ef1?auto=format&fit=crop&w=800&q=80',
-  'Lavatory': 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80',
-
-  // Safety & Emergency
-  'Life Vest': 'https://images.unsplash.com/photo-1519074069444-1ba4fff16def?auto=format&fit=crop&w=800&q=80',
-  'Oxygen Mask': 'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=800&q=80',
-  'Smoke Hood': 'https://images.unsplash.com/photo-1519074069444-1ba4fff16def?auto=format&fit=crop&w=800&q=80',
-  'Fire Extinguisher': 'https://images.unsplash.com/photo-1583073030863-74450d26bd5b?auto=format&fit=crop&w=800&q=80',
-  'First Aid Kit': 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?auto=format&fit=crop&w=800&q=80',
-  'Evacuation Slide': 'https://images.unsplash.com/photo-1508873696983-2df5293cb32b?auto=format&fit=crop&w=800&q=80',
-  'Defibrillator': 'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=800&q=80',
-  'Safety Demo': 'https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?auto=format&fit=crop&w=800&q=80',
-
-  // Service
-  'Meal Tray': 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80',
-  'Beverage Cart': 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80',
-  'Duty Free': 'https://images.unsplash.com/photo-1513094735237-8f2714d57c13?auto=format&fit=crop&w=800&q=80',
-  'Special Meal': 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80',
-
-  // Operations & Announcements
-  'Crosscheck': 'https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?auto=format&fit=crop&w=800&q=80',
-  'Arm Doors': 'https://images.unsplash.com/photo-1569154941061-e231b4725ef1?auto=format&fit=crop&w=800&q=80',
-  'Disarm Doors': 'https://images.unsplash.com/photo-1569154941061-e231b4725ef1?auto=format&fit=crop&w=800&q=80',
-  'Deplaning': 'https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?auto=format&fit=crop&w=800&q=80',
-  'Pushback': 'https://images.unsplash.com/photo-1508873696983-2df5293cb32b?auto=format&fit=crop&w=800&q=80',
-  'Turbulence': 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80',
-};
-
-const categoryFallbacks = {
-  aircraft: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=800&q=80',
-  airport: 'https://images.unsplash.com/photo-1530521954074-e64f6810b32d?auto=format&fit=crop&w=800&q=80',
-  cabin: 'https://images.unsplash.com/photo-1569154941061-e231b4725ef1?auto=format&fit=crop&w=800&q=80',
-  service: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80',
-  safety: 'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=800&q=80',
-  emergency: 'https://images.unsplash.com/photo-1519074069444-1ba4fff16def?auto=format&fit=crop&w=800&q=80',
-  operations: 'https://images.unsplash.com/photo-1508873696983-2df5293cb32b?auto=format&fit=crop&w=800&q=80',
-  announcements: 'https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?auto=format&fit=crop&w=800&q=80',
-};
-
-function getWordImage(word) {
-  if (!word) return categoryFallbacks.aircraft;
-  if (specificTermImages[word.word]) return specificTermImages[word.word];
-  const matchedKey = Object.keys(specificTermImages).find(
-    (k) => word.word.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(word.word.toLowerCase())
-  );
-  if (matchedKey) return specificTermImages[matchedKey];
-  return categoryFallbacks[word.category] || categoryFallbacks.aircraft;
-}
-
 function WordCard({ word, isSaved, onSave, onLearn }) {
-  const imageUrl = getWordImage(word);
   const googleImagesUrl = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(word.word + ' cabin crew aircraft aviation')}`;
   const wikimediaUrl = `https://commons.wikimedia.org/w/index.php?search=${encodeURIComponent(word.word + ' aviation')}`;
 
   return (
-    <div className="max-w-xl bg-white p-6 rounded-3xl border-2 border-aerora-border shadow-md">
-      {/* Visual Image Representation with Quick Search Button */}
-      <div className="relative rounded-2xl overflow-hidden mb-6 h-56 sm:h-64 bg-aerora-bg border border-aerora-border/50 group">
-        <img
-          src={imageUrl}
-          alt={word.word}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          loading="lazy"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-between p-4 text-white">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider bg-white/20 backdrop-blur-md px-3 py-1 rounded-full border border-white/20">
-              {word.category?.replace('_', ' ')}
-            </span>
-            <a
-              href={googleImagesUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-bold bg-white text-aerora-ink px-3 py-1.5 rounded-xl hover:bg-aerora-blue hover:text-white transition-all shadow-md"
-            >
-              <Search className="w-3.5 h-3.5" />
-              <span>Google Images ↗</span>
-            </a>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-bold text-white/90">Visual Cabin Guide</p>
-            <p className="text-[11px] text-white/70">Click button above for 100+ live photos</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex items-start justify-between mb-5">
+    <div className="max-w-xl bg-white p-7 rounded-3xl border-2 border-aerora-border shadow-md">
+      {/* Header */}
+      <div className="flex items-start justify-between mb-4">
         <div>
-          <h2 className="text-3xl font-extrabold text-aerora-ink mb-1 font-heading">{word.word}</h2>
+          <span className="inline-block text-[11px] font-extrabold uppercase tracking-wider bg-aerora-blueLight text-aerora-blue px-3 py-1 rounded-full mb-3">
+            {word.category?.replace('_', ' ')}
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-aerora-ink mb-1 font-heading">{word.word}</h2>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-aerora-blue italic bg-aerora-blueLight px-2 py-0.5 rounded-md">{word.partOfSpeech}</span>
+            <span className="text-xs font-bold text-aerora-blue italic">{word.partOfSpeech}</span>
             <span className="text-xs font-semibold text-aerora-muted">· /{word.pronunciation}/</span>
           </div>
         </div>
@@ -154,22 +51,24 @@ function WordCard({ word, isSaved, onSave, onLearn }) {
           href={googleImagesUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-aerora-blue text-white rounded-xl text-xs font-extrabold shadow-sm hover:bg-aerora-blue/90 transition-all"
+          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-aerora-blue text-white rounded-xl text-xs font-extrabold shadow-sm hover:bg-aerora-blue/90 transition-all group"
         >
           <Search className="w-4 h-4" />
-          <span>Search Photos on Google Images ↗</span>
+          <span>Search Photos on Google Images</span>
+          <ExternalLink className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100" />
         </a>
         <a
           href={wikimediaUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-aerora-bg text-aerora-ink rounded-xl text-xs font-bold border border-aerora-border hover:border-aerora-blue hover:text-aerora-blue transition-all"
+          className="inline-flex items-center justify-center gap-1.5 px-3.5 py-3 bg-aerora-bg text-aerora-ink rounded-xl text-xs font-bold border border-aerora-border hover:border-aerora-blue hover:text-aerora-blue transition-all"
         >
           <BookOpen className="w-3.5 h-3.5" />
           <span>Diagrams ↗</span>
         </a>
       </div>
 
+      {/* Content Details */}
       <div className="space-y-4 mb-8">
         <div className="bg-aerora-bg rounded-2xl p-4 border border-aerora-border/60">
           <p className="text-[11px] font-extrabold text-aerora-muted uppercase tracking-wider mb-1.5">Aviation Meaning</p>
@@ -244,8 +143,8 @@ export default function AviationEnglish() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
         <p className="text-[11px] font-extrabold tracking-[0.2em] text-aerora-blue uppercase mb-2">Aviation English</p>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-aerora-ink mb-2 font-heading">Aviation Vocabulary & Visual Guide</h1>
-        <p className="text-aerora-muted text-base font-medium mb-8 max-w-xl">Learn essential aviation terminology, cabin equipment, and standard phraseology with visual references.</p>
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-aerora-ink mb-2 font-heading">Aviation Vocabulary & Reference Guide</h1>
+        <p className="text-aerora-muted text-base font-medium mb-8 max-w-xl">Learn essential aviation terminology, cabin equipment, and standard phraseology.</p>
       </motion.div>
 
       {/* Instant Search Filter Bar */}
@@ -341,7 +240,6 @@ export default function AviationEnglish() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   {filteredWords.map((word, i) => {
                     const isSaved = state.savedWords.includes(word.id);
-                    const thumbUrl = getWordImage(word);
 
                     return (
                       <motion.button
@@ -350,19 +248,9 @@ export default function AviationEnglish() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: Math.min(i * 0.02, 0.3) }}
                         onClick={() => setSelectedWord(word)}
-                        className="flex items-center gap-3.5 bg-white border-2 border-aerora-border rounded-2xl p-3.5 text-left hover:border-aerora-blue hover:shadow-md transition-all group"
+                        className="flex items-center justify-between bg-white border-2 border-aerora-border rounded-2xl p-4 text-left hover:border-aerora-blue hover:shadow-md transition-all group"
                       >
-                        {/* Thumbnail Image */}
-                        <div className="w-14 h-14 rounded-xl overflow-hidden bg-aerora-bg border border-aerora-border/60 flex-shrink-0">
-                          <img
-                            src={thumbUrl}
-                            alt={word.word}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            loading="lazy"
-                          />
-                        </div>
-
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 pr-2">
                           <p className="text-base font-extrabold text-aerora-ink group-hover:text-aerora-blue transition-colors font-heading truncate">
                             {word.word}
                           </p>
@@ -376,16 +264,16 @@ export default function AviationEnglish() {
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <div className="flex items-center gap-2 flex-shrink-0">
                           <a
                             href={`https://www.google.com/search?tbm=isch&q=${encodeURIComponent(word.word + ' cabin crew aircraft aviation')}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
                             title={`Search real photos of ${word.word} on Google Images`}
-                            className="p-1.5 text-aerora-muted hover:text-aerora-blue hover:bg-aerora-blueLight rounded-lg transition-colors"
+                            className="p-2 text-aerora-muted hover:text-aerora-blue hover:bg-aerora-blueLight rounded-xl border border-transparent hover:border-blue-100 transition-all"
                           >
-                            <Search className="w-3.5 h-3.5" />
+                            <Search className="w-4 h-4" />
                           </a>
                           {isSaved && <BookmarkCheck className="w-4 h-4 text-aerora-blue fill-aerora-blue/20" />}
                           <ChevronRight className="w-4 h-4 text-aerora-border group-hover:text-aerora-blue group-hover:translate-x-0.5 transition-all" />
