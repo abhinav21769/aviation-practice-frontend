@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-aerora-bg text-aerora-ink font-sans;
+    font-feature-settings: 'kern' 1, 'liga' 1, 'cv05' 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: Manrope, sans-serif;
+    letter-spacing: -0.025em;
+  }
+
+  ::selection {
+    @apply bg-aerora-blueLight text-aerora-blue;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-aerora-border rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-aerora-muted/40;
+  }
+}
+
+@layer components {
+  .page-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 py-10;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl border border-aerora-border shadow-card;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:border-aerora-blue/40 hover:shadow-card-hover;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center gap-2 bg-aerora-blue text-white px-6 py-3 rounded-xl text-sm font-bold tracking-wide hover:bg-aerora-blue/90 transition-all shadow-sm hover:shadow-md;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 border border-aerora-border text-aerora-ink px-6 py-3 rounded-xl text-sm font-semibold hover:bg-aerora-border/30 transition-all;
+  }
+
+  .label-xs {
+    @apply text-[11px] font-bold tracking-[0.16em] text-aerora-muted uppercase;
+  }
+
+  .badge {
+    @apply text-[11px] font-bold px-3 py-1 rounded-full tracking-wide;
+  }
+
+  .badge-blue {
+    @apply badge bg-aerora-blueLight text-aerora-blue;
+  }
+
+  .badge-green {
+    @apply badge bg-aerora-greenLight text-aerora-green;
+  }
+
+  .badge-amber {
+    @apply badge bg-aerora-amberLight text-aerora-amber;
+  }
+
+  .input-base {
+    @apply w-full border border-aerora-border rounded-xl px-4 py-2.5 text-sm text-aerora-ink bg-white font-medium focus:outline-none focus:border-aerora-blue/60 transition-colors placeholder:text-aerora-muted/70;
+  }
+
+  .textarea-base {
+    @apply input-base resize-none;
+  }
+}
+
+/* 3D card flip for flashcards */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Safe area for mobile bottom nav */
+.safe-b {
+  padding-bottom: env(safe-area-inset-bottom, 8px);
+}
+
+/* Smooth focus rings */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  @apply outline-none ring-2 ring-aerora-blue/40 ring-offset-1;
+}
