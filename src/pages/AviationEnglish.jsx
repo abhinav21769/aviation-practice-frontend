@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bookmark, BookmarkCheck, ChevronRight, Search, X, BookOpen, ExternalLink, Sparkles } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Search, X, CheckCircle2, ExternalLink } from 'lucide-react';
 import { api } from '../services/api';
 import { useProgress } from '../context/ProgressContext';
 
@@ -16,9 +16,8 @@ const vocabularyCategories = [
   { id: 'announcements', label: 'Announcements' },
 ];
 
-function WordCard({ word, isSaved, onSave, onLearn }) {
+function WordCard({ word, isLearned, onLearn, onNext, onPrev, hasNext, hasPrev }) {
   const googleImagesUrl = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(word.word + ' cabin crew aircraft aviation')}`;
-  const wikimediaUrl = `https://commons.wikimedia.org/w/index.php?search=${encodeURIComponent(word.word + ' aviation')}`;
 
   return (
     <div className="max-w-xl bg-white p-7 rounded-3xl border-2 border-aerora-border shadow-md">
@@ -34,37 +33,25 @@ function WordCard({ word, isSaved, onSave, onLearn }) {
             <span className="text-xs font-semibold text-aerora-muted">· /{word.pronunciation}/</span>
           </div>
         </div>
-        <button
-          onClick={() => onSave(word.id)}
-          className="p-2.5 rounded-xl border-2 border-aerora-border hover:border-aerora-blue hover:bg-aerora-bg transition-all"
-        >
-          {isSaved
-            ? <BookmarkCheck className="w-5 h-5 text-aerora-blue fill-aerora-blue/20" />
-            : <Bookmark className="w-5 h-5 text-aerora-muted" />
-          }
-        </button>
+
+        {isLearned && (
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Learned
+          </span>
+        )}
       </div>
 
-      {/* External Search Links */}
-      <div className="flex flex-wrap gap-2.5 mb-6">
+      {/* Google Images Button */}
+      <div className="mb-6">
         <a
           href={googleImagesUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-aerora-blue text-white rounded-xl text-xs font-extrabold shadow-sm hover:bg-aerora-blue/90 transition-all group"
+          className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-aerora-blue text-white rounded-xl text-xs font-extrabold shadow-sm hover:bg-aerora-blue/90 transition-all group"
         >
           <Search className="w-4 h-4" />
           <span>Search Photos on Google Images</span>
           <ExternalLink className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100" />
-        </a>
-        <a
-          href={wikimediaUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-1.5 px-3.5 py-3 bg-aerora-bg text-aerora-ink rounded-xl text-xs font-bold border border-aerora-border hover:border-aerora-blue hover:text-aerora-blue transition-all"
-        >
-          <BookOpen className="w-3.5 h-3.5" />
-          <span>Diagrams ↗</span>
         </a>
       </div>
 
@@ -96,12 +83,35 @@ function WordCard({ word, isSaved, onSave, onLearn }) {
         )}
       </div>
 
-      <button
-        onClick={() => onLearn(word.id)}
-        className="w-full bg-aerora-blue text-white py-3.5 rounded-xl text-sm font-bold tracking-wide hover:bg-aerora-blue/90 transition-colors shadow-md"
-      >
-        Mark Learned & Next Term →
-      </button>
+      {/* Action Buttons */}
+      <div className="space-y-3">
+        <button
+          onClick={() => onLearn(word.id)}
+          className="w-full bg-aerora-blue text-white py-3.5 rounded-xl text-sm font-bold tracking-wide hover:bg-aerora-blue/90 transition-colors shadow-md flex items-center justify-center gap-2"
+        >
+          <CheckCircle2 className="w-4 h-4" />
+          {isLearned ? 'Mark Learned & Next Term →' : 'Mark Learned & Next Term →'}
+        </button>
+
+        <div className="flex gap-2">
+          {hasPrev && (
+            <button
+              onClick={onPrev}
+              className="flex-1 py-2.5 px-4 rounded-xl border-2 border-aerora-border text-xs font-bold text-aerora-ink hover:bg-aerora-bg transition-colors flex items-center justify-center gap-1"
+            >
+              <ChevronLeft className="w-4 h-4" /> Previous Term
+            </button>
+          )}
+          {hasNext && (
+            <button
+              onClick={onNext}
+              className="flex-1 py-2.5 px-4 rounded-xl border-2 border-aerora-border text-xs font-bold text-aerora-ink hover:bg-aerora-bg transition-colors flex items-center justify-center gap-1"
+            >
+              Next Term <ChevronRight className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -131,12 +141,28 @@ export default function AviationEnglish() {
     return matchCategory && matchSearch;
   });
 
-  const handleSave = (wordId) => dispatch({ type: 'SAVE_WORD', wordId });
-  const handleLearn = () => {
-    dispatch({ type: 'LEARN_WORD' });
-    const idx = filteredWords.findIndex((w) => w.id === selectedWord?.id);
-    const next = filteredWords[idx + 1];
-    setSelectedWord(next || null);
+  const selectedIdx = filteredWords.findIndex((w) => w.id === selectedWord?.id);
+
+  const handleLearn = (wordId) => {
+    dispatch({ type: 'LEARN_WORD', wordId });
+    if (selectedIdx >= 0 && selectedIdx < filteredWords.length - 1) {
+      setSelectedWord(filteredWords[selectedIdx + 1]);
+    } else {
+      // Reached the end of the list
+      setSelectedWord(null);
+    }
+  };
+
+  const handleNext = () => {
+    if (selectedIdx >= 0 && selectedIdx < filteredWords.length - 1) {
+      setSelectedWord(filteredWords[selectedIdx + 1]);
+    }
+  };
+
+  const handlePrev = () => {
+    if (selectedIdx > 0) {
+      setSelectedWord(filteredWords[selectedIdx - 1]);
+    }
   };
 
   return (
@@ -209,9 +235,12 @@ export default function AviationEnglish() {
                 </button>
                 <WordCard
                   word={selectedWord}
-                  isSaved={state.savedWords.includes(selectedWord.id)}
-                  onSave={handleSave}
+                  isLearned={(state.savedWords || []).includes(selectedWord.id)}
                   onLearn={handleLearn}
+                  onNext={handleNext}
+                  onPrev={handlePrev}
+                  hasNext={selectedIdx < filteredWords.length - 1}
+                  hasPrev={selectedIdx > 0}
                 />
               </motion.div>
             </AnimatePresence>
@@ -239,7 +268,7 @@ export default function AviationEnglish() {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   {filteredWords.map((word, i) => {
-                    const isSaved = state.savedWords.includes(word.id);
+                    const isLearned = (state.savedWords || []).includes(word.id);
 
                     return (
                       <motion.button
@@ -251,9 +280,16 @@ export default function AviationEnglish() {
                         className="flex items-center justify-between bg-white border-2 border-aerora-border rounded-2xl p-4 text-left hover:border-aerora-blue hover:shadow-md transition-all group"
                       >
                         <div className="flex-1 min-w-0 pr-2">
-                          <p className="text-base font-extrabold text-aerora-ink group-hover:text-aerora-blue transition-colors font-heading truncate">
-                            {word.word}
-                          </p>
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <p className="text-base font-extrabold text-aerora-ink group-hover:text-aerora-blue transition-colors font-heading truncate">
+                              {word.word}
+                            </p>
+                            {isLearned && (
+                              <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                ✓ Learned
+                              </span>
+                            )}
+                          </div>
                           <div className="flex items-center gap-1.5 mt-0.5">
                             <span className="text-[10px] font-bold text-aerora-blue italic bg-aerora-blueLight px-1.5 py-0.2 rounded">
                               {word.partOfSpeech}
@@ -275,7 +311,6 @@ export default function AviationEnglish() {
                           >
                             <Search className="w-4 h-4" />
                           </a>
-                          {isSaved && <BookmarkCheck className="w-4 h-4 text-aerora-blue fill-aerora-blue/20" />}
                           <ChevronRight className="w-4 h-4 text-aerora-border group-hover:text-aerora-blue group-hover:translate-x-0.5 transition-all" />
                         </div>
                       </motion.button>

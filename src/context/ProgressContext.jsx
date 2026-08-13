@@ -112,12 +112,19 @@ function progressReducer(state, action) {
       };
     }
     case 'LEARN_WORD': {
+      const wordId = action.wordId;
+      const isNew = wordId && !(state.savedWords || []).includes(wordId);
+      if (wordId && isNew) {
+        api.saveWord(wordId);
+      }
+      const updatedSaved = isNew ? [...(state.savedWords || []), wordId] : (state.savedWords || []);
       return {
         ...state,
-        wordsLearned: state.wordsLearned + 1,
+        savedWords: updatedSaved,
+        wordsLearned: isNew ? state.wordsLearned + 1 : state.wordsLearned,
         categoryProgress: {
           ...state.categoryProgress,
-          vocabulary: Math.min(100, state.categoryProgress.vocabulary + 1),
+          vocabulary: Math.min(100, Math.round((updatedSaved.length / 102) * 100)),
         },
       };
     }
