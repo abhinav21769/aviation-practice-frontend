@@ -272,43 +272,14 @@ export default function InterviewPrep() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-        <p className="text-[11px] font-extrabold tracking-[0.2em] text-aerora-blue uppercase mb-2">Preparation</p>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-aerora-ink mb-2 font-heading">Interview Preparation</h1>
-        <p className="text-aerora-muted text-base font-medium mb-8 max-w-xl">Master HR, behavioral, and airline-specific interview questions tailored for cabin crew aspirants.</p>
-      </motion.div>
-
-      {/* AI Airline Prompt Generator Banner */}
-      <div className="bg-gradient-to-r from-aerora-ink to-aerora-blue p-6 rounded-3xl text-white mb-8 shadow-md">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 text-amber-400 text-xs font-extrabold uppercase tracking-wider mb-1">
-              <Sparkles className="w-4 h-4" /> AI Airline Generator
-            </div>
-            <h3 className="text-xl font-extrabold font-heading mb-1">Targeting a specific airline?</h3>
-            <p className="text-xs text-white/80 font-medium">Generate realistic practice questions tailored to your chosen airline.</p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <select
-              value={selectedAirline}
-              onChange={(e) => setSelectedAirline(e.target.value)}
-              className="bg-white/10 text-white font-bold border border-white/20 rounded-xl px-4 py-2.5 text-xs outline-none cursor-pointer focus:bg-white/20"
-            >
-              {AIRLINES.map((a) => (
-                <option key={a} value={a} className="bg-aerora-ink text-white font-bold">{a}</option>
-              ))}
-            </select>
-            <button
-              onClick={handleGenerateAiQuestion}
-              disabled={generating}
-              className="bg-white text-aerora-blue px-5 py-2.5 rounded-xl text-xs font-extrabold hover:bg-white/90 transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
-            >
-              {generating ? 'Generating Prompt...' : 'Generate Airline Question ✨'}
-            </button>
-          </div>
-        </div>
-      </div>
+      {/* Top Header (only when no question is selected) */}
+      {!selectedQuestion && (
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="mb-8">
+          <p className="text-[11px] font-extrabold tracking-[0.2em] text-aerora-blue uppercase mb-2">Preparation</p>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-aerora-ink mb-2 font-heading">Interview Preparation</h1>
+          <p className="text-aerora-muted text-base font-medium max-w-xl">Master HR, behavioral, and airline-specific interview questions tailored for cabin crew aspirants.</p>
+        </motion.div>
+      )}
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Sidebar */}
