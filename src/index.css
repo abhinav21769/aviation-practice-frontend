@@ -6,7 +6,6 @@
   *, ::before, ::after {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
-    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 
   html {
@@ -14,17 +13,21 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 16px;
   }
 
   body {
     @apply bg-aerora-bg text-aerora-ink;
     font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-feature-settings: 'kern' 1, 'liga' 1, 'cv05' 1;
+    font-size: 1rem;
+    line-height: 1.55;
   }
 
-  h1, h2, h3, h4, h5, h6, p, span, button, input, textarea, select, a, div {
-    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Manrope', sans-serif;
     letter-spacing: -0.02em;
+    font-weight: 800;
   }
 
   ::selection {

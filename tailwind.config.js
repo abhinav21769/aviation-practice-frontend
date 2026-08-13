@@ -26,7 +26,16 @@ export default {
         mono: ['Manrope', 'sans-serif'],
       },
       fontSize: {
-        '2xs': ['0.65rem', { lineHeight: '1rem' }],
+        '2xs': ['0.72rem', { lineHeight: '1.05rem' }],
+        'xs': ['0.8125rem', { lineHeight: '1.25rem' }], // ~13px
+        'sm': ['0.9375rem', { lineHeight: '1.45rem' }], // ~15px
+        'base': ['1.0625rem', { lineHeight: '1.65rem' }], // ~17px
+        'lg': ['1.1875rem', { lineHeight: '1.75rem' }], // ~19px
+        'xl': ['1.375rem', { lineHeight: '1.85rem' }], // ~22px
+        '2xl': ['1.625rem', { lineHeight: '2.1rem' }], // ~26px
+        '3xl': ['2rem', { lineHeight: '2.4rem' }], // ~32px
+        '4xl': ['2.5rem', { lineHeight: '2.8rem' }], // ~40px
+        '5xl': ['3.25rem', { lineHeight: '3.5rem' }], // ~52px
       },
       boxShadow: {
         'card': '0 1px 3px 0 rgba(23,23,23,0.06), 0 1px 2px -1px rgba(23,23,23,0.04)',
