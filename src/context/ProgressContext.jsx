@@ -24,6 +24,7 @@ const initialState = {
   todayEstimatedMinutes: 20,
   savedWords: [],
   completedQuestions: [],
+  questionResponses: [],
   completedScenarios: [],
   scenarioResponses: [],
   weeklyProgress: [0, 0, 0, 0, 0, 0, 0],
@@ -58,15 +59,32 @@ function progressReducer(state, action) {
       };
     }
     case 'COMPLETE_QUESTION': {
-      if (state.completedQuestions.includes(action.questionId)) return state;
-      api.completeQuestion(action.questionId);
+      const { questionId, answer, starAnswer } = typeof action.payload === 'object' ? action.payload : { questionId: action.questionId };
+      api.completeQuestion(questionId, answer, starAnswer);
+      
+      const responses = state.questionResponses || [];
+      const existingIdx = responses.findIndex((r) => r.questionId === questionId);
+      let updatedResponses = [...responses];
+      if (existingIdx >= 0) {
+        updatedResponses[existingIdx] = {
+          ...updatedResponses[existingIdx],
+          answer: answer !== undefined ? answer : updatedResponses[existingIdx].answer,
+          starAnswer: starAnswer !== undefined ? starAnswer : updatedResponses[existingIdx].starAnswer,
+          answeredAt: new Date(),
+        };
+      } else if (answer || starAnswer) {
+        updatedResponses.push({ questionId, answer: answer || '', starAnswer: starAnswer || null, answeredAt: new Date() });
+      }
+
+      const isNew = !state.completedQuestions.includes(questionId);
       return {
         ...state,
-        completedQuestions: [...state.completedQuestions, action.questionId],
-        questionsAnswered: state.questionsAnswered + 1,
+        questionResponses: updatedResponses,
+        completedQuestions: isNew ? [...state.completedQuestions, questionId] : state.completedQuestions,
+        questionsAnswered: isNew ? state.questionsAnswered + 1 : state.questionsAnswered,
         categoryProgress: {
           ...state.categoryProgress,
-          interview: Math.min(100, state.categoryProgress.interview + 2),
+          interview: isNew ? Math.min(100, state.categoryProgress.interview + 2) : state.categoryProgress.interview,
         },
       };
     }

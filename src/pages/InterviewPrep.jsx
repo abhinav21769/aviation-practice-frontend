@@ -15,38 +15,69 @@ const questionCategories = [
 
 const AIRLINES = ['Emirates', 'Qatar Airways', 'Singapore Airlines', 'Delta Air Lines', 'British Airways'];
 
-function STARBuilder({ question }) {
-  const [parts, setParts] = useState({ situation: '', task: '', action: '', result: '' });
+function STARBuilder({ question, savedParts, onPartsChange, onApplyToAnswer }) {
+  const [parts, setParts] = useState(
+    savedParts || { situation: '', task: '', action: '', result: '' }
+  );
+
+  useEffect(() => {
+    if (savedParts) {
+      setParts(savedParts);
+    } else {
+      setParts({ situation: '', task: '', action: '', result: '' });
+    }
+  }, [question.id, savedParts]);
+
   const labels = {
     situation: { label: 'S — Situation', hint: 'What was the context? Set the scene briefly.' },
     task: { label: 'T — Task', hint: 'What was expected of you in that situation?' },
     action: { label: 'A — Action', hint: 'What specifically did YOU do? Focus on your actions.' },
     result: { label: 'R — Result', hint: 'What was the positive outcome? What did you learn?' },
   };
-  const allFilled = Object.values(parts).every((v) => v.trim().length > 20);
-  const full = allFilled ? `${parts.situation} ${parts.task} ${parts.action} ${parts.result}` : null;
+
+  const handlePartChange = (key, val) => {
+    const updated = { ...parts, [key]: val };
+    setParts(updated);
+    if (onPartsChange) onPartsChange(updated);
+  };
+
+  const allFilled = Object.values(parts).some((v) => v && v.trim().length > 10);
+  const full = Object.values(parts).filter(Boolean).join(' ').trim();
 
   return (
-    <div className="space-y-4 bg-white p-5 rounded-2xl border border-aerora-border shadow-sm">
-      <div className="flex items-center gap-2 mb-1">
-        <Star className="w-4 h-4 text-aerora-blue fill-aerora-blue" />
-        <p className="text-xs font-extrabold text-aerora-blue uppercase tracking-wider">STAR Answer Builder</p>
+    <div className="space-y-4 bg-white p-5 rounded-2xl border-2 border-aerora-border shadow-sm">
+      <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center gap-2">
+          <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+          <p className="text-xs font-extrabold text-aerora-blue uppercase tracking-wider">STAR Answer Framework</p>
+        </div>
+        {full && onApplyToAnswer && (
+          <button
+            type="button"
+            onClick={() => onApplyToAnswer(full)}
+            className="text-xs font-bold text-aerora-blue hover:underline"
+          >
+            Insert into practice answer ↓
+          </button>
+        )}
       </div>
+
       {Object.entries(labels).map(([key, { label, hint }]) => (
         <div key={key}>
           <label className="block text-xs font-bold text-aerora-ink mb-1">{label}</label>
           <p className="text-xs font-medium text-aerora-muted mb-1.5">{hint}</p>
           <textarea
-            value={parts[key]}
-            onChange={(e) => setParts({ ...parts, [key]: e.target.value })}
+            value={parts[key] || ''}
+            onChange={(e) => handlePartChange(key, e.target.value)}
             className="w-full border border-aerora-border rounded-xl p-3 text-sm font-medium text-aerora-ink bg-aerora-bg resize-none h-20 focus:outline-none focus:border-aerora-blue transition-colors"
             placeholder={`Your ${label.toLowerCase()}...`}
           />
         </div>
       ))}
-      {full && (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="border-2 border-aerora-green/40 bg-aerora-greenLight rounded-xl p-4">
-          <p className="text-xs font-extrabold text-aerora-green uppercase tracking-wider mb-2">Your Structured Answer</p>
+
+      {full.length > 30 && (
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="border-2 border-emerald-300 bg-emerald-50/70 rounded-xl p-4">
+          <p className="text-xs font-extrabold text-emerald-800 uppercase tracking-wider mb-2">Structured STAR Summary</p>
           <p className="text-sm font-semibold text-aerora-ink leading-relaxed">{full}</p>
         </motion.div>
       )}
@@ -55,21 +86,59 @@ function STARBuilder({ question }) {
 }
 
 function QuestionDetail({ question, onBack, onNext }) {
+  const { state, dispatch } = useProgress();
   const [answer, setAnswer] = useState('');
+  const [starParts, setStarParts] = useState(null);
   const [submitted, setSubmitted] = useState(false);
-  const { dispatch } = useProgress();
+  const [saving, setSaving] = useState(false);
 
-  const handleSubmit = () => {
-    if (answer.trim().length < 10) return;
+  // Pre-fill user answer if revisited
+  useEffect(() => {
+    const saved = (state.questionResponses || []).find((r) => r.questionId === question.id);
+    if (saved) {
+      setAnswer(saved.answer || '');
+      setStarParts(saved.starAnswer || null);
+      setSubmitted(true);
+    } else {
+      setAnswer('');
+      setStarParts(null);
+      setSubmitted(false);
+    }
+  }, [question.id, state.questionResponses]);
+
+  const handleSubmit = async () => {
+    if (answer.trim().length < 5 && !starParts) return;
+    setSaving(true);
+    dispatch({
+      type: 'COMPLETE_QUESTION',
+      payload: {
+        questionId: question.id,
+        answer,
+        starAnswer: starParts,
+      },
+    });
+    setSaving(false);
     setSubmitted(true);
-    dispatch({ type: 'COMPLETE_QUESTION', questionId: question.id });
+  };
+
+  const handleReset = () => {
+    setAnswer('');
+    setStarParts({ situation: '', task: '', action: '', result: '' });
+    setSubmitted(false);
   };
 
   return (
     <motion.div key={question.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }} className="max-w-2xl">
-      <button onClick={onBack} className="flex items-center gap-1.5 text-xs font-bold text-aerora-blue hover:underline mb-6 transition-colors">
-        ← Back to all questions
-      </button>
+      <div className="flex items-center justify-between mb-6">
+        <button onClick={onBack} className="flex items-center gap-1.5 text-xs font-bold text-aerora-blue hover:underline transition-colors">
+          ← Back to all questions
+        </button>
+        {submitted && (
+          <button onClick={handleReset} className="flex items-center gap-1 text-xs font-bold text-aerora-muted hover:text-aerora-ink">
+            <RotateCcw className="w-3.5 h-3.5" /> Clear & Write New Answer
+          </button>
+        )}
+      </div>
 
       <div className="flex items-center gap-2 mb-4">
         {question.airline && (
@@ -94,7 +163,7 @@ function QuestionDetail({ question, onBack, onNext }) {
           <p className="text-sm font-semibold text-aerora-ink leading-relaxed">{question.whatTheyLookFor}</p>
         </div>
 
-        <div className="border-2 border-aerora-border rounded-2xl p-5 bg-white">
+        <div className="border-2 border-aerora-border rounded-2xl p-5 bg-white shadow-xs">
           <p className="text-[11px] font-extrabold text-aerora-muted uppercase tracking-wider mb-2">Recommended Framework</p>
           <p className="text-sm font-semibold text-aerora-ink leading-relaxed">{question.framework}</p>
         </div>
@@ -105,33 +174,44 @@ function QuestionDetail({ question, onBack, onNext }) {
         </div>
       </div>
 
-      {question.starApplicable && <div className="mb-8"><STARBuilder question={question} /></div>}
+      {question.starApplicable && (
+        <div className="mb-8">
+          <STARBuilder
+            question={question}
+            savedParts={starParts}
+            onPartsChange={(parts) => setStarParts(parts)}
+            onApplyToAnswer={(fullText) => setAnswer(fullText)}
+          />
+        </div>
+      )}
 
       <div className="mb-6">
-        <label className="block text-xs font-extrabold text-aerora-ink mb-1">Your Personal Practice Answer</label>
-        <p className="text-xs font-semibold text-aerora-muted mb-2">Structure your thoughts naturally — aim for genuine confidence.</p>
+        <div className="flex items-center justify-between mb-1">
+          <label className="block text-xs font-extrabold text-aerora-ink">Your Personal Practice Answer</label>
+          {submitted && (
+            <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+              ✓ Saved in your profile
+            </span>
+          )}
+        </div>
+        <p className="text-xs font-semibold text-aerora-muted mb-2">Structure your thoughts naturally — your answer is automatically remembered whenever you revisit this question.</p>
         <textarea
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
-          className="w-full border-2 border-aerora-border rounded-2xl p-4 text-sm font-medium text-aerora-ink bg-white resize-none h-32 focus:outline-none focus:border-aerora-blue transition-colors"
+          className="w-full border-2 border-aerora-border rounded-2xl p-4 text-sm font-medium text-aerora-ink bg-white resize-none h-36 focus:outline-none focus:border-aerora-blue transition-colors shadow-xs"
           placeholder="Write your answer here..."
         />
       </div>
 
       <div className="flex gap-3">
-        {!submitted ? (
-          <button
-            onClick={handleSubmit}
-            disabled={answer.trim().length < 10}
-            className="flex-1 bg-aerora-blue text-white py-3 rounded-xl text-sm font-bold tracking-wide disabled:opacity-40 hover:bg-aerora-blue/90 transition-colors shadow-sm"
-          >
-            Mark Answer Complete
-          </button>
-        ) : (
-          <button onClick={() => { setAnswer(''); setSubmitted(false); }} className="flex items-center gap-2 text-sm font-bold text-aerora-blue hover:underline">
-            <RotateCcw className="w-4 h-4" /> Practice Again
-          </button>
-        )}
+        <button
+          onClick={handleSubmit}
+          disabled={saving || answer.trim().length < 5}
+          className="flex-1 bg-aerora-blue text-white py-3 rounded-xl text-sm font-bold tracking-wide disabled:opacity-40 hover:bg-aerora-blue/90 transition-colors shadow-sm"
+        >
+          {submitted ? 'Update Saved Answer' : 'Save & Mark Complete'}
+        </button>
+
         {onNext && (
           <button onClick={onNext} className="px-5 py-3 border-2 border-aerora-border rounded-xl text-sm font-bold text-aerora-ink hover:bg-aerora-bg transition-colors">
             Next Question →
@@ -140,8 +220,8 @@ function QuestionDetail({ question, onBack, onNext }) {
       </div>
 
       {submitted && (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mt-4 flex items-center gap-2 text-aerora-green font-bold text-sm bg-aerora-greenLight p-3 rounded-xl border border-aerora-green/30">
-          <CheckCircle2 className="w-4 h-4" /> Answer saved successfully!
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mt-4 flex items-center gap-2 text-emerald-800 font-bold text-sm bg-emerald-50 p-3 rounded-xl border border-emerald-300">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Answer saved successfully!
         </motion.div>
       )}
     </motion.div>
@@ -300,6 +380,11 @@ export default function InterviewPrep() {
                             )}
                             {q.airline && (
                               <span className="text-[10px] font-extrabold text-aerora-blue bg-aerora-blueLight px-2 py-0.5 rounded-full">{q.airline}</span>
+                            )}
+                            {isCompleted && (
+                              <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                ✓ Answered
+                              </span>
                             )}
                           </div>
                           <p className="text-sm font-bold text-aerora-ink group-hover:text-aerora-blue transition-colors leading-snug truncate">

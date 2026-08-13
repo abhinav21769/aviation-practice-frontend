@@ -113,10 +113,10 @@ export const api = {
     return data?.progress || null;
   },
 
-  async completeQuestion(questionId) {
+  async completeQuestion(questionId, answer, starAnswer) {
     const data = await fetchJson('/progress/question', {
       method: 'POST',
-      body: JSON.stringify({ questionId }),
+      body: JSON.stringify({ questionId, answer, starAnswer }),
     });
     return data?.progress || null;
   },
