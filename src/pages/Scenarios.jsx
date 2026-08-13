@@ -9,14 +9,38 @@ import { useProgress } from '../context/ProgressContext';
 import AviationLoader, { CardSkeleton } from '../components/shared/AviationLoader';
 
 const scenarioCategories = [
+  { id: 'difficult_passengers', label: 'Disruptive Passengers' },
   { id: 'medical', label: 'Medical Emergencies' },
-  { id: 'disruptive_passenger', label: 'Disruptive Passengers' },
-  { id: 'safety_security', label: 'Safety & Security' },
-  { id: 'service_recovery', label: 'Service Recovery' },
-  { id: 'crew_cooperation', label: 'Crew Communication' },
+  { id: 'emergency', label: 'Safety & Security' },
+  { id: 'service', label: 'Service Recovery' },
+  { id: 'conflict', label: 'Crew & Conflict' },
   { id: 'special_needs', label: 'Special Needs Passengers' },
-  { id: 'irregular_ops', label: 'Irregular Operations' },
+  { id: 'delays', label: 'Irregular Operations' },
 ];
+
+const categoryMap = {
+  difficult_passengers: 'Disruptive Passengers',
+  disruptive_passengers: 'Disruptive Passengers',
+  disruptive_passenger: 'Disruptive Passengers',
+  medical: 'Medical Emergencies',
+  medical_emergencies: 'Medical Emergencies',
+  emergency: 'Safety & Security',
+  safety_violations: 'Safety & Security',
+  safety_security: 'Safety & Security',
+  service: 'Service Recovery',
+  service_recovery: 'Service Recovery',
+  conflict: 'Crew & Conflict',
+  crew_cooperation: 'Crew & Conflict',
+  team_coordination: 'Crew & Conflict',
+  special_needs: 'Special Needs Passengers',
+  delays: 'Irregular Operations',
+  irregular_operations: 'Irregular Operations',
+  irregular_ops: 'Irregular Operations',
+};
+
+function getCategoryLabel(catId) {
+  return categoryMap[catId] || catId || 'General';
+}
 
 function ScenarioDetail({ scenario, onBack, onNext }) {
   const { state, dispatch } = useProgress();
@@ -335,7 +359,9 @@ export default function Scenarios() {
     loadScenarios();
   }, []);
 
-  const filteredScenarios = activeCategory ? scenarios.filter((s) => s.category === activeCategory) : scenarios;
+  const filteredScenarios = activeCategory
+    ? scenarios.filter((s) => s.category === activeCategory || categoryMap[s.category] === categoryMap[activeCategory])
+    : scenarios;
   const selectedIdx = filteredScenarios.findIndex((s) => s.id === selectedScenario?.id);
 
   return (
@@ -378,7 +404,7 @@ export default function Scenarios() {
                 <span className={`text-xs font-extrabold px-2.5 py-0.5 rounded-full ${!activeCategory ? 'bg-white/20 text-white' : 'bg-aerora-border/60 text-aerora-ink'}`}>{scenarios.length}</span>
               </button>
               {scenarioCategories.map((cat) => {
-                const count = scenarios.filter((s) => s.category === cat.id).length;
+                const count = scenarios.filter((s) => s.category === cat.id || categoryMap[s.category] === cat.label).length;
                 return (
                   <button
                     key={cat.id}
@@ -404,7 +430,7 @@ export default function Scenarios() {
           <div className="flex-1">
             <div className="flex items-center justify-between mb-4">
               <p className="text-xs font-bold text-aerora-muted uppercase tracking-wider">
-                {filteredScenarios.length} scenarios {activeCategory ? `in ${scenarioCategories.find(c => c.id === activeCategory)?.label}` : ''}
+                {filteredScenarios.length} scenarios {activeCategory ? `in ${categoryMap[activeCategory] || activeCategory}` : ''}
               </p>
             </div>
 
@@ -436,7 +462,7 @@ export default function Scenarios() {
                             scenario.difficulty === 'medium' ? 'bg-amber-50 text-amber-700 border-amber-200' :
                             'bg-rose-50 text-rose-700 border-rose-200'
                           }`}>{scenario.difficulty}</span>
-                          <span className="text-xs font-bold text-aerora-muted">{scenarioCategories.find(c => c.id === scenario.category)?.label || 'General'}</span>
+                          <span className="text-xs font-bold text-aerora-muted">{getCategoryLabel(scenario.category)}</span>
                           {isDone && (
                             <span className={`text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wide ${
                               isCorrectAnswer ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
