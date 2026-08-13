@@ -10,14 +10,17 @@ import AviationLoader, { GridSkeleton } from '../components/shared/AviationLoade
 
 const vocabularyCategories = [
   { id: 'all', label: 'All Terms' },
-  { id: 'aircraft', label: 'Aircraft' },
   { id: 'airport', label: 'Airport' },
+  { id: 'aircraft', label: 'Aircraft' },
   { id: 'cabin', label: 'Cabin' },
-  { id: 'service', label: 'Service' },
   { id: 'safety', label: 'Safety' },
+  { id: 'service', label: 'Service' },
+  { id: 'communication', label: 'Communication' },
+  { id: 'medical', label: 'Medical' },
+  { id: 'weather', label: 'Weather' },
+  { id: 'announcements', label: 'Announcements' },
   { id: 'emergency', label: 'Emergency' },
   { id: 'operations', label: 'Operations' },
-  { id: 'announcements', label: 'Announcements' },
 ];
 
 function speakText(text, rate = 0.88) {
