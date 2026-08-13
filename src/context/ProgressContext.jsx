@@ -5,34 +5,35 @@ const STORAGE_KEY = 'aerora_progress';
 
 const initialState = {
   userName: 'Nishtha',
-  questionsAnswered: 47,
-  wordsLearned: 126,
-  scenariosCompleted: 23,
-  mockInterviews: 8,
-  daysActive: 5,
-  overallProgress: 68,
-  currentStreak: 7,
+  questionsAnswered: 0,
+  wordsLearned: 0,
+  scenariosCompleted: 0,
+  mockInterviews: 0,
+  daysActive: 1,
+  overallProgress: 0,
+  currentStreak: 0,
   lastActiveDate: new Date().toDateString(),
-  currentDay: 12,
+  currentDay: 1,
   todayTasks: [
-    { id: 't1', label: 'Learn 5 aviation terms', completed: true },
+    { id: 't1', label: 'Learn 5 aviation terms', completed: false },
     { id: 't2', label: 'Practice 3 interview questions', completed: false },
     { id: 't3', label: 'Complete 5 situational scenarios', completed: false },
-    { id: 't4', label: 'Practice one English response', completed: true },
+    { id: 't4', label: 'Practice one English response', completed: false },
   ],
-  todayFocus: 'Handling Difficult Passengers & Emergency Escalation',
-  todayEstimatedMinutes: 25,
+  todayFocus: 'Personal Introduction & Customer Service Excellence',
+  todayEstimatedMinutes: 20,
   savedWords: [],
   completedQuestions: [],
   completedScenarios: [],
-  weeklyProgress: [20, 35, 15, 40, 25, 10, 30],
+  scenarioResponses: [],
+  weeklyProgress: [0, 0, 0, 0, 0, 0, 0],
   categoryProgress: {
-    interview: 72,
-    vocabulary: 58,
-    english: 45,
-    scenarios: 63,
-    knowledge: 40,
-    simulator: 55,
+    interview: 0,
+    vocabulary: 0,
+    english: 0,
+    scenarios: 0,
+    knowledge: 0,
+    simulator: 0,
   },
   simulatorSessions: [],
 };
@@ -69,16 +70,26 @@ function progressReducer(state, action) {
         },
       };
     }
-    case 'COMPLETE_SCENARIO': {
-      if (state.completedScenarios.includes(action.scenarioId)) return state;
-      api.completeScenario(action.scenarioId);
+    case 'RECORD_SCENARIO_ANSWER': {
+      const { scenarioId, selectedOption, isCorrect } = action.payload;
+      const responses = state.scenarioResponses || [];
+      const existingIndex = responses.findIndex((r) => r.scenarioId === scenarioId);
+      let updatedResponses = [...responses];
+      if (existingIndex >= 0) {
+        updatedResponses[existingIndex] = { scenarioId, selectedOption, isCorrect, answeredAt: new Date() };
+      } else {
+        updatedResponses.push({ scenarioId, selectedOption, isCorrect, answeredAt: new Date() });
+      }
+
+      const isNew = !state.completedScenarios.includes(scenarioId);
       return {
         ...state,
-        completedScenarios: [...state.completedScenarios, action.scenarioId],
-        scenariosCompleted: state.scenariosCompleted + 1,
+        scenarioResponses: updatedResponses,
+        completedScenarios: isNew ? [...state.completedScenarios, scenarioId] : state.completedScenarios,
+        scenariosCompleted: isNew ? state.scenariosCompleted + 1 : state.scenariosCompleted,
         categoryProgress: {
           ...state.categoryProgress,
-          scenarios: Math.min(100, state.categoryProgress.scenarios + 2),
+          scenarios: isNew ? Math.min(100, state.categoryProgress.scenarios + 2) : state.categoryProgress.scenarios,
         },
       };
     }
@@ -138,7 +149,9 @@ export function ProgressProvider({ children }) {
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch {}
+    } catch {
+      // ignore
+    }
   }, [state]);
 
   const todayCompleted = state.todayTasks.filter((t) => t.completed).length;

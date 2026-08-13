@@ -67,6 +67,14 @@ export const api = {
     return data?.scenarios || null;
   },
 
+  async submitScenarioAnswer(scenarioId, selectedOption) {
+    const data = await fetchJson(`/scenarios/${scenarioId}/answer`, {
+      method: 'POST',
+      body: JSON.stringify({ selectedOption }),
+    });
+    return data || null;
+  },
+
   // Exercises
   async getExercises(category = null) {
     const params = new URLSearchParams();
