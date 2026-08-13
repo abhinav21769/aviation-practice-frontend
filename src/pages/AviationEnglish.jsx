@@ -50,7 +50,7 @@ function WordDetailView({ word, isLearned, onLearn, onNext, onPrev, hasNext, has
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -16 }}
       transition={{ duration: 0.3 }}
-      className="max-w-3xl mx-auto"
+      className="max-w-6xl mx-auto"
     >
       {/* Top Back & Navigation Bar */}
       <div className="flex items-center justify-between mb-6">
@@ -83,144 +83,150 @@ function WordDetailView({ word, isLearned, onLearn, onNext, onPrev, hasNext, has
       </div>
 
       <div className="bg-white p-7 sm:p-9 rounded-3xl border-2 border-aerora-border shadow-sm">
-        {/* Header */}
-        <div className="flex items-start justify-between mb-6">
-          <div>
-            <span className="inline-block text-xs font-extrabold uppercase tracking-wider bg-aerora-blueLight text-aerora-blue px-3.5 py-1.5 rounded-full mb-3">
-              {word.category?.replace('_', ' ')}
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-aerora-ink font-heading">{word.word}</h2>
-            <div className="flex items-center gap-2.5 mt-1">
-              <span className="text-xs font-bold text-aerora-blue italic">{word.partOfSpeech}</span>
-              <span className="text-xs font-semibold text-aerora-muted">· /{word.pronunciation}/</span>
-            </div>
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left Column: Content & Meaning */}
+          <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
+            {/* Header */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="inline-block text-xs font-extrabold uppercase tracking-wider bg-aerora-blueLight text-aerora-blue px-3.5 py-1.5 rounded-full">
+                  {word.category?.replace('_', ' ')}
+                </span>
 
-          {isLearned && (
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-200 shadow-xs">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Learned
-            </span>
-          )}
-        </div>
-
-        {/* Live Internet Visuals */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-2.5">
-            <div className="flex items-center gap-2 text-xs font-extrabold text-aerora-ink">
-              <ImageIcon className="w-4 h-4 text-aerora-blue" />
-              <span>Live Visual Reference</span>
-            </div>
-            {images.length > 1 && (
-              <span className="text-xs font-bold text-aerora-muted">
-                {activeImgIdx + 1} of {images.length} photos
-              </span>
-            )}
-          </div>
-
-          {loadingImages ? (
-            <div className="h-64 sm:h-80 rounded-2xl bg-aerora-bg border border-aerora-border flex flex-col items-center justify-center gap-2.5 text-aerora-muted">
-              <Loader2 className="w-7 h-7 animate-spin text-aerora-blue" />
-              <span className="text-xs font-semibold">Fetching live authentic photos from internet...</span>
-            </div>
-          ) : images.length > 0 ? (
-            <div className="space-y-3">
-              {/* Main Photo */}
-              <div className="relative h-64 sm:h-80 rounded-2xl overflow-hidden bg-black/5 border border-aerora-border shadow-xs">
-                <img
-                  src={images[activeImgIdx]}
-                  alt={word.word}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.style.display = 'none';
-                  }}
-                />
-                <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[11px] font-extrabold px-3 py-1 rounded-full border border-white/20">
-                  Web Photo
-                </div>
+                {isLearned && (
+                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-200 shadow-xs">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Learned
+                  </span>
+                )}
               </div>
 
-              {/* Thumbnails */}
-              {images.length > 1 && (
-                <div className="flex gap-2.5 overflow-x-auto pb-1">
-                  {images.map((img, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setActiveImgIdx(i)}
-                      className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 flex-shrink-0 transition-all ${
-                        activeImgIdx === i ? 'border-aerora-blue scale-105 shadow-sm' : 'border-transparent opacity-70 hover:opacity-100'
-                      }`}
-                    >
-                      <img src={img} alt="" className="w-full h-full object-cover" />
-                    </button>
-                  ))}
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-aerora-ink font-heading mb-1">{word.word}</h2>
+              <div className="flex items-center gap-2.5 mt-1">
+                <span className="text-xs font-bold text-aerora-blue italic bg-aerora-blueLight px-2 py-0.5 rounded-md">{word.partOfSpeech}</span>
+                <span className="text-xs font-semibold text-aerora-muted">· /{word.pronunciation}/</span>
+              </div>
+            </div>
+
+            {/* Meaning & Examples */}
+            <div className="space-y-4">
+              <div className="bg-aerora-bg rounded-2xl p-5 border border-aerora-border/60">
+                <p className="text-xs font-extrabold text-aerora-muted uppercase tracking-wider mb-1.5">Aviation Meaning</p>
+                <p className="text-base font-semibold text-aerora-ink leading-relaxed">{word.definition}</p>
+              </div>
+
+              {word.exampleSentence && (
+                <div className="border-l-4 border-aerora-blue pl-5 py-2 bg-aerora-blueLight/30 rounded-r-2xl">
+                  <p className="text-xs font-extrabold text-aerora-blue uppercase tracking-wider mb-1">In-Flight Example</p>
+                  <p className="text-base font-medium text-aerora-ink italic leading-relaxed">"{word.exampleSentence}"</p>
+                </div>
+              )}
+
+              {word.relatedWords && word.relatedWords.length > 0 && (
+                <div>
+                  <p className="text-xs font-extrabold text-aerora-muted uppercase tracking-wider mb-2">Related Aviation Terms</p>
+                  <div className="flex flex-wrap gap-2">
+                    {word.relatedWords.map((w) => (
+                      <span key={w} className="text-xs font-bold px-3 py-1 bg-white text-aerora-ink rounded-full border border-aerora-border shadow-xs">
+                        {w}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
-          ) : (
-            <div className="p-6 rounded-2xl bg-aerora-bg border border-aerora-border text-center">
-              <p className="text-sm font-semibold text-aerora-muted mb-2">No direct image preview returned from web.</p>
-              <a
-                href={googleImagesUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-aerora-blue hover:underline"
+
+            {/* Primary Action Button */}
+            <div className="pt-2">
+              <button
+                onClick={() => onLearn(word.id)}
+                className="w-full bg-aerora-blue text-white py-4 rounded-2xl text-base font-bold tracking-wide hover:bg-aerora-blue/90 transition-colors shadow-md flex items-center justify-center gap-2"
               >
-                Open Google Images for {word.word} ↗
-              </a>
+                <CheckCircle2 className="w-5 h-5" />
+                Mark Learned & Next Term →
+              </button>
             </div>
-          )}
-        </div>
-
-        {/* Google Images Button */}
-        <div className="mb-8">
-          <a
-            href={googleImagesUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-aerora-blue text-white rounded-2xl text-xs font-extrabold shadow-sm hover:bg-aerora-blue/90 transition-all group"
-          >
-            <span>Search More Photos on Google Images</span>
-            <ExternalLink className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100" />
-          </a>
-        </div>
-
-        {/* Meaning & Examples */}
-        <div className="space-y-5 mb-8">
-          <div className="bg-aerora-bg rounded-2xl p-5 border border-aerora-border/60">
-            <p className="text-xs font-extrabold text-aerora-muted uppercase tracking-wider mb-1.5">Aviation Meaning</p>
-            <p className="text-base font-semibold text-aerora-ink leading-relaxed">{word.definition}</p>
           </div>
 
-          {word.exampleSentence && (
-            <div className="border-l-4 border-aerora-blue pl-5 py-1.5 bg-aerora-blueLight/30 rounded-r-2xl">
-              <p className="text-xs font-extrabold text-aerora-blue uppercase tracking-wider mb-1">In-Flight Example</p>
-              <p className="text-base font-medium text-aerora-ink italic leading-relaxed">"{word.exampleSentence}"</p>
-            </div>
-          )}
-
-          {word.relatedWords && word.relatedWords.length > 0 && (
-            <div>
-              <p className="text-xs font-extrabold text-aerora-muted uppercase tracking-wider mb-2">Related Aviation Terms</p>
-              <div className="flex flex-wrap gap-2">
-                {word.relatedWords.map((w) => (
-                  <span key={w} className="text-xs font-bold px-3 py-1 bg-white text-aerora-ink rounded-full border border-aerora-border shadow-xs">
-                    {w}
-                  </span>
-                ))}
+          {/* Right Column: Live Internet Images & Search */}
+          <div className="lg:col-span-5 flex flex-col space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs font-extrabold text-aerora-ink">
+                <ImageIcon className="w-4 h-4 text-aerora-blue" />
+                <span>Live Visual Reference</span>
               </div>
+              {images.length > 1 && (
+                <span className="text-xs font-bold text-aerora-muted">
+                  {activeImgIdx + 1} of {images.length} photos
+                </span>
+              )}
             </div>
-          )}
-        </div>
 
-        {/* Primary Action Button */}
-        <button
-          onClick={() => onLearn(word.id)}
-          className="w-full bg-aerora-blue text-white py-4 rounded-2xl text-base font-bold tracking-wide hover:bg-aerora-blue/90 transition-colors shadow-md flex items-center justify-center gap-2"
-        >
-          <CheckCircle2 className="w-5 h-5" />
-          Mark Learned & Next Term →
-        </button>
+            {loadingImages ? (
+              <div className="h-64 sm:h-72 rounded-2xl bg-aerora-bg border border-aerora-border flex flex-col items-center justify-center gap-2.5 text-aerora-muted">
+                <Loader2 className="w-7 h-7 animate-spin text-aerora-blue" />
+                <span className="text-xs font-semibold">Fetching live photos from internet...</span>
+              </div>
+            ) : images.length > 0 ? (
+              <div className="space-y-3">
+                {/* Main Photo */}
+                <div className="relative h-64 sm:h-72 rounded-2xl overflow-hidden bg-black/5 border border-aerora-border shadow-xs group">
+                  <img
+                    src={images[activeImgIdx]}
+                    alt={word.word}
+                    className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                  <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[11px] font-extrabold px-3 py-1 rounded-full border border-white/20">
+                    Web Photo
+                  </div>
+                </div>
+
+                {/* Thumbnails */}
+                {images.length > 1 && (
+                  <div className="flex gap-2 overflow-x-auto pb-1">
+                    {images.map((img, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setActiveImgIdx(i)}
+                        className={`relative w-14 h-14 rounded-xl overflow-hidden border-2 flex-shrink-0 transition-all ${
+                          activeImgIdx === i ? 'border-aerora-blue scale-105 shadow-sm' : 'border-transparent opacity-70 hover:opacity-100'
+                        }`}
+                      >
+                        <img src={img} alt="" className="w-full h-full object-cover" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="p-6 rounded-2xl bg-aerora-bg border border-aerora-border text-center">
+                <p className="text-sm font-semibold text-aerora-muted mb-2">No direct photo preview returned.</p>
+                <a
+                  href={googleImagesUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-aerora-blue hover:underline"
+                >
+                  Open Google Images for {word.word} ↗
+                </a>
+              </div>
+            )}
+
+            {/* Google Images Button */}
+            <a
+              href={googleImagesUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-aerora-blue text-white rounded-2xl text-xs font-extrabold shadow-sm hover:bg-aerora-blue/90 transition-all group"
+            >
+              <span>Search More Photos on Google Images</span>
+              <ExternalLink className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100" />
+            </a>
+          </div>
+        </div>
       </div>
     </motion.div>
   );
