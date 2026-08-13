@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronLeft, Search, X, CheckCircle2, ExternalLink, Image as ImageIcon, Loader2, Sparkles } from 'lucide-react';
+import { ChevronRight, ChevronLeft, CheckCircle2, ExternalLink, Image as ImageIcon, Loader2, ArrowLeft } from 'lucide-react';
 import { api } from '../services/api';
 import { useProgress } from '../context/ProgressContext';
 
@@ -16,14 +16,13 @@ const vocabularyCategories = [
   { id: 'announcements', label: 'Announcements' },
 ];
 
-function WordDetailPanel({ word, isLearned, onLearn, onNext, onPrev, hasNext, hasPrev, onClose }) {
+function WordDetailView({ word, isLearned, onLearn, onNext, onPrev, hasNext, hasPrev, onBack }) {
   const [images, setImages] = useState([]);
   const [loadingImages, setLoadingImages] = useState(true);
   const [activeImgIdx, setActiveImgIdx] = useState(0);
 
   const googleImagesUrl = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(word.word + ' cabin crew aircraft aviation')}`;
 
-  // Fetch live internet photos whenever the selected word changes
   useEffect(() => {
     let isMounted = true;
     setLoadingImages(true);
@@ -45,178 +44,185 @@ function WordDetailPanel({ word, isLearned, onLearn, onNext, onPrev, hasNext, ha
   }, [word.id, word.word]);
 
   return (
-    <div className="bg-white p-6 rounded-3xl border-2 border-aerora-border shadow-md">
-      {/* Top Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <span className="inline-block text-[11px] font-extrabold uppercase tracking-wider bg-aerora-blueLight text-aerora-blue px-3 py-1 rounded-full mb-2">
-            {word.category?.replace('_', ' ')}
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-aerora-ink font-heading">{word.word}</h2>
-          <div className="flex items-center gap-2 mt-0.5">
-            <span className="text-xs font-bold text-aerora-blue italic">{word.partOfSpeech}</span>
-            <span className="text-xs font-semibold text-aerora-muted">· /{word.pronunciation}/</span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {isLearned && (
-            <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Learned
-            </span>
-          )}
-          {onClose && (
-            <button
-              onClick={onClose}
-              className="p-1.5 rounded-xl border border-aerora-border text-aerora-muted hover:text-aerora-ink hover:bg-aerora-bg lg:hidden"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Live Internet Images Section */}
-      <div className="mb-5">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-1.5 text-xs font-extrabold text-aerora-ink">
-            <ImageIcon className="w-3.5 h-3.5 text-aerora-blue" />
-            <span>Live Internet Visual Reference</span>
-          </div>
-          {images.length > 1 && (
-            <span className="text-[11px] font-bold text-aerora-muted">
-              {activeImgIdx + 1} of {images.length} photos
-            </span>
-          )}
-        </div>
-
-        {loadingImages ? (
-          <div className="h-48 sm:h-52 rounded-2xl bg-aerora-bg border border-aerora-border/60 flex flex-col items-center justify-center gap-2 text-aerora-muted">
-            <Loader2 className="w-6 h-6 animate-spin text-aerora-blue" />
-            <span className="text-xs font-semibold">Fetching live photos from internet...</span>
-          </div>
-        ) : images.length > 0 ? (
-          <div className="space-y-2">
-            {/* Main Active Photo */}
-            <div className="relative h-48 sm:h-56 rounded-2xl overflow-hidden bg-black/5 border border-aerora-border/60 group">
-              <img
-                src={images[activeImgIdx]}
-                alt={word.word}
-                className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.style.display = 'none';
-                }}
-              />
-              <div className="absolute top-2.5 right-2.5 bg-black/60 backdrop-blur-md text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full border border-white/20">
-                Web Photo
-              </div>
-            </div>
-
-            {/* Thumbnail selector if multiple images */}
-            {images.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-1">
-                {images.map((img, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActiveImgIdx(i)}
-                    className={`relative w-12 h-12 rounded-xl overflow-hidden border-2 flex-shrink-0 transition-all ${
-                      activeImgIdx === i ? 'border-aerora-blue scale-105 shadow-sm' : 'border-transparent opacity-70 hover:opacity-100'
-                    }`}
-                  >
-                    <img src={img} alt="" className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="p-4 rounded-2xl bg-aerora-bg border border-aerora-border/60 text-center">
-            <p className="text-xs font-semibold text-aerora-muted mb-2">No direct live photo preview returned.</p>
-            <a
-              href={googleImagesUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-aerora-blue hover:underline"
-            >
-              <Search className="w-3.5 h-3.5" /> Open Google Images for {word.word} ↗
-            </a>
-          </div>
-        )}
-      </div>
-
-      {/* Google Images Direct Button */}
-      <div className="mb-6">
-        <a
-          href={googleImagesUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-aerora-blue text-white rounded-xl text-xs font-extrabold shadow-sm hover:bg-aerora-blue/90 transition-all group"
-        >
-          <Search className="w-3.5 h-3.5" />
-          <span>Search More Photos on Google Images</span>
-          <ExternalLink className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100" />
-        </a>
-      </div>
-
-      {/* Content Details */}
-      <div className="space-y-4 mb-6">
-        <div className="bg-aerora-bg rounded-2xl p-4 border border-aerora-border/60">
-          <p className="text-[11px] font-extrabold text-aerora-muted uppercase tracking-wider mb-1">Aviation Meaning</p>
-          <p className="text-sm font-semibold text-aerora-ink leading-relaxed">{word.definition}</p>
-        </div>
-
-        {word.exampleSentence && (
-          <div className="border-l-4 border-aerora-blue pl-4 py-1">
-            <p className="text-[11px] font-extrabold text-aerora-blue uppercase tracking-wider mb-1">In-Flight Example</p>
-            <p className="text-sm font-semibold text-aerora-ink italic leading-relaxed">"{word.exampleSentence}"</p>
-          </div>
-        )}
-
-        {word.relatedWords && word.relatedWords.length > 0 && (
-          <div>
-            <p className="text-[11px] font-extrabold text-aerora-muted uppercase tracking-wider mb-1.5">Related Aviation Terms</p>
-            <div className="flex flex-wrap gap-1.5">
-              {word.relatedWords.map((w) => (
-                <span key={w} className="text-xs font-bold px-2.5 py-0.5 bg-white text-aerora-ink rounded-full border border-aerora-border shadow-xs">
-                  {w}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Action Buttons */}
-      <div className="space-y-2.5">
+    <motion.div
+      key={word.id}
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -16 }}
+      transition={{ duration: 0.3 }}
+      className="max-w-3xl mx-auto"
+    >
+      {/* Top Back & Navigation Bar */}
+      <div className="flex items-center justify-between mb-6">
         <button
-          onClick={() => onLearn(word.id)}
-          className="w-full bg-aerora-blue text-white py-3 rounded-xl text-sm font-bold tracking-wide hover:bg-aerora-blue/90 transition-colors shadow-md flex items-center justify-center gap-2"
+          onClick={onBack}
+          className="inline-flex items-center gap-2 text-sm font-extrabold text-aerora-blue hover:underline transition-colors"
         >
-          <CheckCircle2 className="w-4 h-4" />
-          Mark Learned & Next Term →
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to all terms</span>
         </button>
 
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           {hasPrev && (
             <button
               onClick={onPrev}
-              className="flex-1 py-2 px-3 rounded-xl border-2 border-aerora-border text-xs font-bold text-aerora-ink hover:bg-aerora-bg transition-colors flex items-center justify-center gap-1"
+              className="px-3.5 py-1.5 rounded-xl border-2 border-aerora-border text-xs font-bold text-aerora-ink hover:bg-white transition-colors flex items-center gap-1"
             >
-              <ChevronLeft className="w-3.5 h-3.5" /> Previous
+              <ChevronLeft className="w-3.5 h-3.5" /> Prev
             </button>
           )}
           {hasNext && (
             <button
               onClick={onNext}
-              className="flex-1 py-2 px-3 rounded-xl border-2 border-aerora-border text-xs font-bold text-aerora-ink hover:bg-aerora-bg transition-colors flex items-center justify-center gap-1"
+              className="px-3.5 py-1.5 rounded-xl border-2 border-aerora-border text-xs font-bold text-aerora-ink hover:bg-white transition-colors flex items-center gap-1"
             >
               Next <ChevronRight className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
       </div>
-    </div>
+
+      <div className="bg-white p-7 sm:p-9 rounded-3xl border-2 border-aerora-border shadow-sm">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-6">
+          <div>
+            <span className="inline-block text-xs font-extrabold uppercase tracking-wider bg-aerora-blueLight text-aerora-blue px-3.5 py-1.5 rounded-full mb-3">
+              {word.category?.replace('_', ' ')}
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-aerora-ink font-heading">{word.word}</h2>
+            <div className="flex items-center gap-2.5 mt-1">
+              <span className="text-xs font-bold text-aerora-blue italic">{word.partOfSpeech}</span>
+              <span className="text-xs font-semibold text-aerora-muted">· /{word.pronunciation}/</span>
+            </div>
+          </div>
+
+          {isLearned && (
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-200 shadow-xs">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Learned
+            </span>
+          )}
+        </div>
+
+        {/* Live Internet Visuals */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2.5">
+            <div className="flex items-center gap-2 text-xs font-extrabold text-aerora-ink">
+              <ImageIcon className="w-4 h-4 text-aerora-blue" />
+              <span>Live Visual Reference</span>
+            </div>
+            {images.length > 1 && (
+              <span className="text-xs font-bold text-aerora-muted">
+                {activeImgIdx + 1} of {images.length} photos
+              </span>
+            )}
+          </div>
+
+          {loadingImages ? (
+            <div className="h-64 sm:h-80 rounded-2xl bg-aerora-bg border border-aerora-border flex flex-col items-center justify-center gap-2.5 text-aerora-muted">
+              <Loader2 className="w-7 h-7 animate-spin text-aerora-blue" />
+              <span className="text-xs font-semibold">Fetching live authentic photos from internet...</span>
+            </div>
+          ) : images.length > 0 ? (
+            <div className="space-y-3">
+              {/* Main Photo */}
+              <div className="relative h-64 sm:h-80 rounded-2xl overflow-hidden bg-black/5 border border-aerora-border shadow-xs">
+                <img
+                  src={images[activeImgIdx]}
+                  alt={word.word}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.style.display = 'none';
+                  }}
+                />
+                <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[11px] font-extrabold px-3 py-1 rounded-full border border-white/20">
+                  Web Photo
+                </div>
+              </div>
+
+              {/* Thumbnails */}
+              {images.length > 1 && (
+                <div className="flex gap-2.5 overflow-x-auto pb-1">
+                  {images.map((img, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setActiveImgIdx(i)}
+                      className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 flex-shrink-0 transition-all ${
+                        activeImgIdx === i ? 'border-aerora-blue scale-105 shadow-sm' : 'border-transparent opacity-70 hover:opacity-100'
+                      }`}
+                    >
+                      <img src={img} alt="" className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="p-6 rounded-2xl bg-aerora-bg border border-aerora-border text-center">
+              <p className="text-sm font-semibold text-aerora-muted mb-2">No direct image preview returned from web.</p>
+              <a
+                href={googleImagesUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-aerora-blue hover:underline"
+              >
+                Open Google Images for {word.word} ↗
+              </a>
+            </div>
+          )}
+        </div>
+
+        {/* Google Images Button */}
+        <div className="mb-8">
+          <a
+            href={googleImagesUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-aerora-blue text-white rounded-2xl text-xs font-extrabold shadow-sm hover:bg-aerora-blue/90 transition-all group"
+          >
+            <span>Search More Photos on Google Images</span>
+            <ExternalLink className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100" />
+          </a>
+        </div>
+
+        {/* Meaning & Examples */}
+        <div className="space-y-5 mb-8">
+          <div className="bg-aerora-bg rounded-2xl p-5 border border-aerora-border/60">
+            <p className="text-xs font-extrabold text-aerora-muted uppercase tracking-wider mb-1.5">Aviation Meaning</p>
+            <p className="text-base font-semibold text-aerora-ink leading-relaxed">{word.definition}</p>
+          </div>
+
+          {word.exampleSentence && (
+            <div className="border-l-4 border-aerora-blue pl-5 py-1.5 bg-aerora-blueLight/30 rounded-r-2xl">
+              <p className="text-xs font-extrabold text-aerora-blue uppercase tracking-wider mb-1">In-Flight Example</p>
+              <p className="text-base font-medium text-aerora-ink italic leading-relaxed">"{word.exampleSentence}"</p>
+            </div>
+          )}
+
+          {word.relatedWords && word.relatedWords.length > 0 && (
+            <div>
+              <p className="text-xs font-extrabold text-aerora-muted uppercase tracking-wider mb-2">Related Aviation Terms</p>
+              <div className="flex flex-wrap gap-2">
+                {word.relatedWords.map((w) => (
+                  <span key={w} className="text-xs font-bold px-3 py-1 bg-white text-aerora-ink rounded-full border border-aerora-border shadow-xs">
+                    {w}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Primary Action Button */}
+        <button
+          onClick={() => onLearn(word.id)}
+          className="w-full bg-aerora-blue text-white py-4 rounded-2xl text-base font-bold tracking-wide hover:bg-aerora-blue/90 transition-colors shadow-md flex items-center justify-center gap-2"
+        >
+          <CheckCircle2 className="w-5 h-5" />
+          Mark Learned & Next Term →
+        </button>
+      </div>
+    </motion.div>
   );
 }
 
@@ -231,8 +237,6 @@ export default function AviationEnglish() {
       const serverVocab = await api.getVocabulary();
       if (serverVocab && serverVocab.length > 0) {
         setVocabulary(serverVocab);
-        // Default select the first item on desktop
-        if (!selectedWord) setSelectedWord(serverVocab[0]);
       }
     }
     loadVocab();
@@ -248,20 +252,23 @@ export default function AviationEnglish() {
     dispatch({ type: 'LEARN_WORD', wordId });
     if (selectedIdx >= 0 && selectedIdx < categoryWords.length - 1) {
       setSelectedWord(categoryWords[selectedIdx + 1]);
-    } else if (categoryWords.length > 0) {
-      setSelectedWord(categoryWords[0]);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      setSelectedWord(null);
     }
   };
 
   const handleNext = () => {
     if (selectedIdx >= 0 && selectedIdx < categoryWords.length - 1) {
       setSelectedWord(categoryWords[selectedIdx + 1]);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const handlePrev = () => {
     if (selectedIdx > 0) {
       setSelectedWord(categoryWords[selectedIdx - 1]);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -273,138 +280,109 @@ export default function AviationEnglish() {
         <p className="text-aerora-muted text-base font-medium max-w-xl">Explore essential aviation terms with live internet visual references.</p>
       </motion.div>
 
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Sidebar Categories */}
-        <aside className="lg:w-56 flex-shrink-0">
-          <div className="space-y-1.5">
-            {vocabularyCategories.map((cat) => {
-              const count = cat.id === 'all'
-                ? vocabulary.length
-                : vocabulary.filter((w) => w.category === cat.id).length;
+      {selectedWord ? (
+        <AnimatePresence mode="wait">
+          <WordDetailView
+            word={selectedWord}
+            isLearned={(state.savedWords || []).includes(selectedWord.id)}
+            onLearn={handleLearn}
+            onNext={handleNext}
+            onPrev={handlePrev}
+            hasNext={selectedIdx < categoryWords.length - 1}
+            hasPrev={selectedIdx > 0}
+            onBack={() => setSelectedWord(null)}
+          />
+        </AnimatePresence>
+      ) : (
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar Categories */}
+          <aside className="lg:w-64 flex-shrink-0">
+            <div className="space-y-1.5">
+              {vocabularyCategories.map((cat) => {
+                const count = cat.id === 'all'
+                  ? vocabulary.length
+                  : vocabulary.filter((w) => w.category === cat.id).length;
 
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => {
-                    setActiveCategory(cat.id);
-                    const list = cat.id === 'all' ? vocabulary : vocabulary.filter((w) => w.category === cat.id);
-                    if (list.length > 0) setSelectedWord(list[0]);
-                  }}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-colors ${
-                    activeCategory === cat.id ? 'bg-aerora-blue text-white shadow-sm' : 'text-aerora-muted hover:text-aerora-ink hover:bg-aerora-bg'
-                  }`}
-                >
-                  <span>{cat.label}</span>
-                  <span className={`text-xs font-extrabold px-2 py-0.5 rounded-full ${
-                    activeCategory === cat.id ? 'bg-white/20 text-white' : 'bg-aerora-border/60 text-aerora-ink'
-                  }`}>{count}</span>
-                </button>
-              );
-            })}
-          </div>
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      setActiveCategory(cat.id);
+                    }}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-bold transition-colors ${
+                      activeCategory === cat.id ? 'bg-aerora-blue text-white shadow-sm' : 'text-aerora-muted hover:text-aerora-ink hover:bg-aerora-bg'
+                    }`}
+                  >
+                    <span>{cat.label}</span>
+                    <span className={`text-xs font-extrabold px-2.5 py-0.5 rounded-full ${
+                      activeCategory === cat.id ? 'bg-white/20 text-white' : 'bg-aerora-border/60 text-aerora-ink'
+                    }`}>{count}</span>
+                  </button>
+                );
+              })}
+            </div>
 
-          <div className="mt-6 bg-white rounded-2xl p-4 border border-aerora-border shadow-sm">
-            <p className="text-xs font-bold text-aerora-muted mb-1 uppercase tracking-wider">Learned Words</p>
-            <div className="text-3xl font-extrabold text-aerora-blue font-heading">{state.wordsLearned}</div>
-          </div>
-        </aside>
+            <div className="mt-6 bg-white rounded-2xl p-5 border border-aerora-border shadow-sm">
+              <p className="text-xs font-bold text-aerora-muted mb-1 uppercase tracking-wider">Learned Words</p>
+              <div className="text-3xl font-extrabold text-aerora-blue font-heading">{state.wordsLearned}</div>
+            </div>
+          </aside>
 
-        {/* Middle Terms List */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-xs font-bold text-aerora-muted uppercase tracking-wider">
-              {categoryWords.length} terms {activeCategory !== 'all' ? `in ${vocabularyCategories.find(c => c.id === activeCategory)?.label}` : ''}
-            </p>
-          </div>
+          {/* Main Terms List */}
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-xs font-bold text-aerora-muted uppercase tracking-wider">
+                {categoryWords.length} terms {activeCategory !== 'all' ? `in ${vocabularyCategories.find(c => c.id === activeCategory)?.label}` : ''}
+              </p>
+            </div>
 
-          <div className="space-y-2.5">
-            {categoryWords.map((word, i) => {
-              const isLearned = (state.savedWords || []).includes(word.id);
-              const isSelected = selectedWord?.id === word.id;
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              {categoryWords.map((word, i) => {
+                const isLearned = (state.savedWords || []).includes(word.id);
 
-              return (
-                <motion.button
-                  key={word.id}
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: Math.min(i * 0.015, 0.2) }}
-                  onClick={() => setSelectedWord(word)}
-                  className={`w-full flex items-center justify-between rounded-2xl p-4 text-left transition-all group border-2 ${
-                    isSelected
-                      ? 'bg-aerora-blueLight/50 border-aerora-blue shadow-sm'
-                      : 'bg-white border-aerora-border hover:border-aerora-blue/50 hover:shadow-xs'
-                  }`}
-                >
-                  <div className="flex-1 min-w-0 pr-3">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className={`text-base font-extrabold font-heading truncate transition-colors ${
-                        isSelected ? 'text-aerora-blue' : 'text-aerora-ink group-hover:text-aerora-blue'
-                      }`}>
-                        {word.word}
-                      </p>
-                      {isLearned && (
-                        <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                          ✓ Learned
+                return (
+                  <motion.button
+                    key={word.id}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: Math.min(i * 0.02, 0.25) }}
+                    onClick={() => {
+                      setSelectedWord(word);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="flex items-center justify-between bg-white border-2 border-aerora-border rounded-2xl p-4 text-left hover:border-aerora-blue hover:shadow-md transition-all group"
+                  >
+                    <div className="flex-1 min-w-0 pr-2">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="text-base font-extrabold text-aerora-ink group-hover:text-aerora-blue transition-colors font-heading truncate">
+                          {word.word}
+                        </p>
+                        {isLearned && (
+                          <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                            ✓ Learned
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-aerora-blue italic bg-aerora-blueLight px-2 py-0.5 rounded-md">
+                          {word.partOfSpeech}
                         </span>
-                      )}
+                        <span className="text-xs font-medium text-aerora-muted truncate">
+                          /{word.pronunciation}/
+                        </span>
+                      </div>
                     </div>
-                    <p className="text-xs font-medium text-aerora-muted line-clamp-1">
-                      {word.definition}
-                    </p>
-                  </div>
 
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className="text-[10px] font-bold text-aerora-blue italic bg-aerora-blueLight px-2 py-0.5 rounded">
-                      {word.partOfSpeech}
-                    </span>
-                    <ChevronRight className={`w-4 h-4 transition-all ${
-                      isSelected ? 'text-aerora-blue translate-x-1' : 'text-aerora-border group-hover:text-aerora-blue'
-                    }`} />
-                  </div>
-                </motion.button>
-              );
-            })}
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      <ChevronRight className="w-5 h-5 text-aerora-border group-hover:text-aerora-blue group-hover:translate-x-1 transition-all" />
+                    </div>
+                  </motion.button>
+                );
+              })}
+            </div>
           </div>
         </div>
-
-        {/* Right Side Detail Panel (Sticky & Independently Scrollable) */}
-        <div className="lg:w-[440px] xl:w-[470px] flex-shrink-0">
-          <div className="lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-y-auto lg:overscroll-contain pr-1 pb-8">
-            {selectedWord ? (
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={selectedWord.id}
-                  initial={{ opacity: 0, x: 16 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -16 }}
-                  transition={{ duration: 0.25 }}
-                >
-                  <WordDetailPanel
-                    word={selectedWord}
-                    isLearned={(state.savedWords || []).includes(selectedWord.id)}
-                    onLearn={handleLearn}
-                    onNext={handleNext}
-                    onPrev={handlePrev}
-                    hasNext={selectedIdx < categoryWords.length - 1}
-                    hasPrev={selectedIdx > 0}
-                    onClose={() => setSelectedWord(null)}
-                  />
-                </motion.div>
-              </AnimatePresence>
-            ) : (
-              <div className="bg-white p-8 rounded-3xl border-2 border-aerora-border text-center">
-                <div className="w-12 h-12 rounded-2xl bg-aerora-blueLight text-aerora-blue flex items-center justify-center mx-auto mb-3">
-                  <ImageIcon className="w-6 h-6" />
-                </div>
-                <h3 className="text-base font-extrabold text-aerora-ink mb-1">Select Any Vocabulary Term</h3>
-                <p className="text-xs font-medium text-aerora-muted">
-                  Click on any term from the list to fetch live internet photos, in-flight examples, and pronunciation.
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
