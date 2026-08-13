@@ -72,6 +72,7 @@ export default function Progress() {
             <p className="text-aerora-muted text-sm font-medium">Track your skill balance and weekly consistency.</p>
           </div>
           <div className="flex items-center gap-3">
+            {/* Reset Progress Button (Hidden from UI)
             <button
               onClick={handleReset}
               disabled={resetting}
@@ -81,6 +82,7 @@ export default function Progress() {
               <RotateCcw className={`w-3.5 h-3.5 ${resetting ? 'animate-spin' : ''}`} />
               <span>{resetting ? 'Resetting...' : 'Reset Progress'}</span>
             </button>
+            */}
             <div className="flex items-center gap-3 bg-white p-3.5 rounded-2xl border-2 border-aerora-border shadow-sm">
               <div className="text-4xl font-extrabold text-aerora-blue font-heading leading-none">{state.overallProgress}%</div>
               <div className="text-xs font-bold text-aerora-muted uppercase tracking-wider">Overall<br />Ready Score</div>
