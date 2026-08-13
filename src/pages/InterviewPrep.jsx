@@ -160,18 +160,24 @@ function QuestionDetail({ question, onBack, onNext }) {
 
       <div className="space-y-6 mb-8">
         <div className="bg-aerora-blueLight rounded-2xl p-5 border border-blue-100">
-          <p className="text-[11px] font-extrabold text-aerora-blue uppercase tracking-wider mb-2">What Interviewers Are Looking For</p>
-          <p className="text-sm font-semibold text-aerora-ink leading-relaxed">{question.whatTheyLookFor}</p>
+          <p className="text-xs font-extrabold text-aerora-blue uppercase tracking-wider mb-2">What Interviewers Are Looking For</p>
+          <p className="text-sm font-semibold text-aerora-ink leading-relaxed">
+            {question.whatTheyLookFor || (question.whatInterviewersLookFor && question.whatInterviewersLookFor.length > 0 ? question.whatInterviewersLookFor.join(' · ') : 'Recruiters assess your confidence, genuine hospitality mindset, emotional intelligence, and ability to prioritize passenger safety while working within cabin crew procedures.')}
+          </p>
         </div>
 
         <div className="border-2 border-aerora-border rounded-2xl p-5 bg-white shadow-xs">
-          <p className="text-[11px] font-extrabold text-aerora-muted uppercase tracking-wider mb-2">Recommended Framework</p>
-          <p className="text-sm font-semibold text-aerora-ink leading-relaxed">{question.framework}</p>
+          <p className="text-xs font-extrabold text-aerora-muted uppercase tracking-wider mb-2">Recommended Framework</p>
+          <p className="text-sm font-semibold text-aerora-ink leading-relaxed">
+            {question.framework || (question.starApplicable ? 'STAR Method: Situation -> Task -> Action -> Result' : 'Core Identity Statement -> Concrete Hospitality Example -> Long-Term Airline Contribution')}
+          </p>
         </div>
 
         <div className="bg-aerora-bg rounded-2xl p-5 border-l-4 border-aerora-blue">
-          <p className="text-[11px] font-extrabold text-aerora-blue uppercase tracking-wider mb-2">Model Answer Guidance</p>
-          <p className="text-sm font-medium text-aerora-ink leading-relaxed italic">"{question.exampleAnswer}"</p>
+          <p className="text-xs font-extrabold text-aerora-blue uppercase tracking-wider mb-2">Model Answer Guidance</p>
+          <p className="text-sm font-medium text-aerora-ink leading-relaxed italic">
+            "{question.exampleAnswer || question.modelAnswer || 'Structure your response clearly with warmth and professional confidence. Focus on concrete actions and positive customer impact.'}"
+          </p>
         </div>
       </div>
 
