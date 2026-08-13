@@ -1,9 +1,18 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, BookOpen, CheckCircle2, RotateCcw, Star, Sparkles, Plane } from 'lucide-react';
-import { interviewQuestions, questionCategories } from '../data/interviewQuestions';
 import { api } from '../services/api';
 import { useProgress } from '../context/ProgressContext';
+
+const questionCategories = [
+  { id: 'personal', label: 'Personal' },
+  { id: 'customer_service', label: 'Customer Service' },
+  { id: 'teamwork', label: 'Teamwork' },
+  { id: 'conflict_resolution', label: 'Conflict Resolution' },
+  { id: 'safety_emergency', label: 'Safety & Emergency' },
+  { id: 'airline_specific', label: 'Airline-Specific' },
+  { id: 'cultural_awareness', label: 'Cultural Awareness' },
+];
 
 const AIRLINES = ['Emirates', 'Qatar Airways', 'Singapore Airlines', 'Delta Air Lines', 'British Airways'];
 
@@ -146,7 +155,7 @@ export default function InterviewPrep() {
   const [search, setSearch] = useState('');
   const [selectedAirline, setSelectedAirline] = useState('Emirates');
   const [generating, setGenerating] = useState(false);
-  const [questions, setQuestions] = useState(interviewQuestions);
+  const [questions, setQuestions] = useState([]);
   const { state } = useProgress();
 
   useEffect(() => {

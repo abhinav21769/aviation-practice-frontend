@@ -1,9 +1,19 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bookmark, BookmarkCheck, ChevronRight } from 'lucide-react';
-import { vocabulary as fallbackVocab, vocabularyCategories, getDailyWord as fallbackDaily } from '../data/vocabulary';
 import { api } from '../services/api';
 import { useProgress } from '../context/ProgressContext';
+
+const vocabularyCategories = [
+  { id: 'airport', label: 'Airport' },
+  { id: 'aircraft', label: 'Aircraft' },
+  { id: 'cabin', label: 'Cabin' },
+  { id: 'safety', label: 'Safety' },
+  { id: 'service', label: 'Service' },
+  { id: 'communication', label: 'Communication' },
+  { id: 'medical', label: 'Medical' },
+  { id: 'weather', label: 'Weather' },
+];
 
 function WordCard({ word, isSaved, onSave, onLearn }) {
   return (
@@ -87,8 +97,8 @@ export default function AviationEnglish() {
   const [selectedWord, setSelectedWord] = useState(null);
   const [mode, setMode] = useState('browse');
   const [flashIdx, setFlashIdx] = useState(0);
-  const [vocabulary, setVocabulary] = useState(fallbackVocab);
-  const [dailyWord, setDailyWord] = useState(fallbackDaily());
+  const [vocabulary, setVocabulary] = useState([]);
+  const [dailyWord, setDailyWord] = useState(null);
   const { state, dispatch } = useProgress();
 
   useEffect(() => {

@@ -1,32 +1,43 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Search, X, BookOpen, Globe, BookMarked, Plane } from 'lucide-react';
-import { interviewQuestions } from '../../data/interviewQuestions';
-import { vocabulary } from '../../data/vocabulary';
-import { scenarios } from '../../data/scenarios';
+import { api } from '../../services/api';
 
-function buildIndex() {
-  const results = [];
-  interviewQuestions.slice(0, 30).forEach((q) =>
-    results.push({ type: 'question', id: q.id, label: q.question, category: q.category, icon: BookOpen, to: `/interview-prep?q=${q.id}` })
-  );
-  vocabulary.slice(0, 30).forEach((v) =>
-    results.push({ type: 'word', id: v.id, label: v.word, category: v.category, icon: Globe, to: `/aviation-english?w=${v.id}` })
-  );
-  scenarios.slice(0, 20).forEach((s) =>
-    results.push({ type: 'scenario', id: s.id, label: s.title, category: s.category, icon: BookMarked, to: `/scenarios?s=${s.id}` })
-  );
-  return results;
-}
-
-const searchIndex = buildIndex();
 const typeLabel = { question: 'Question', word: 'Vocabulary', scenario: 'Scenario' };
 const typeColor = { question: 'text-aerora-blue bg-aerora-blueLight', word: 'text-emerald-700 bg-emerald-50', scenario: 'text-amber-700 bg-amber-50' };
 
 export default function SearchModal({ open, onClose }) {
   const [query, setQuery] = useState('');
+  const [searchIndex, setSearchIndex] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!open) return;
+    async function loadIndex() {
+      try {
+        const [qRes, vRes, sRes] = await Promise.all([
+          api.getQuestions(),
+          api.getVocabulary(),
+          api.getScenarios(),
+        ]);
+        const results = [];
+        (qRes || []).slice(0, 40).forEach((q) =>
+          results.push({ type: 'question', id: q.id, label: q.question, category: q.category, icon: BookOpen, to: `/interview-prep?q=${q.id}` })
+        );
+        (vRes || []).slice(0, 40).forEach((v) =>
+          results.push({ type: 'word', id: v.id, label: v.word, category: v.category, icon: Globe, to: `/aviation-english?w=${v.id}` })
+        );
+        (sRes || []).slice(0, 30).forEach((s) =>
+          results.push({ type: 'scenario', id: s.id, label: s.title, category: s.category, icon: BookMarked, to: `/scenarios?s=${s.id}` })
+        );
+        setSearchIndex(results);
+      } catch (e) {
+        console.warn('Search index load failed:', e);
+      }
+    }
+    loadIndex();
+  }, [open]);
 
   const results = query.trim().length > 1
     ? searchIndex.filter((item) => item.label.toLowerCase().includes(query.toLowerCase())).slice(0, 8)

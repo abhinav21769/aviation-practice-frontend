@@ -1,8 +1,15 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
-import { knowledgeTopics as fallbackTopics, knowledgeCategories } from '../data/knowledgeTopics';
 import { api } from '../services/api';
+
+const knowledgeCategories = [
+  { id: 'airline_profiles', label: 'Airline Profiles' },
+  { id: 'aircraft_types', label: 'Aircraft Types' },
+  { id: 'safety_systems', label: 'Safety Systems' },
+  { id: 'grooming_standards', label: 'Grooming Standards' },
+  { id: 'service_procedures', label: 'Service Procedures' },
+];
 
 function TopicDetail({ topic, onBack }) {
   return (
@@ -52,14 +59,14 @@ function TopicDetail({ topic, onBack }) {
 export default function Knowledge() {
   const [activeCategory, setActiveCategory] = useState(null);
   const [selectedTopic, setSelectedTopic] = useState(null);
-  const [topics, setTopics] = useState(fallbackTopics);
+  const [topics, setTopics] = useState([]);
 
   useEffect(() => {
-    async function loadKnowledge() {
+    async function loadTopics() {
       const serverTopics = await api.getKnowledge();
       if (serverTopics) setTopics(serverTopics);
     }
-    loadKnowledge();
+    loadTopics();
   }, []);
 
   const filteredTopics = activeCategory ? topics.filter((t) => t.category === activeCategory) : topics;

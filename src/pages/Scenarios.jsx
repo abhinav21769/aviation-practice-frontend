@@ -1,9 +1,18 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, ChevronRight, X, Sparkles } from 'lucide-react';
-import { scenarios as fallbackScenarios, scenarioCategories } from '../data/scenarios';
 import { api } from '../services/api';
 import { useProgress } from '../context/ProgressContext';
+
+const scenarioCategories = [
+  { id: 'disruptive_passengers', label: 'Disruptive Passengers' },
+  { id: 'medical_emergencies', label: 'Medical Emergencies' },
+  { id: 'safety_violations', label: 'Safety Violations' },
+  { id: 'service_recovery', label: 'Service Recovery' },
+  { id: 'special_needs', label: 'Special Needs' },
+  { id: 'team_coordination', label: 'Team Coordination' },
+  { id: 'irregular_operations', label: 'Irregular Operations' },
+];
 
 function ScenarioDetail({ scenario, onBack, onNext }) {
   const [selected, setSelected] = useState(null);
@@ -117,7 +126,7 @@ function ScenarioDetail({ scenario, onBack, onNext }) {
 export default function Scenarios() {
   const [activeCategory, setActiveCategory] = useState(null);
   const [selectedScenario, setSelectedScenario] = useState(null);
-  const [scenarios, setScenarios] = useState(fallbackScenarios);
+  const [scenarios, setScenarios] = useState([]);
   const { state } = useProgress();
 
   useEffect(() => {

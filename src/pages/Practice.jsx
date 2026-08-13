@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, ChevronRight, Sparkles, RotateCcw, CheckCircle2 } from 'lucide-react';
-import { interviewQuestions } from '../data/interviewQuestions';
+import { useEffect } from 'react';
 import { api } from '../services/api';
 import { useProgress } from '../context/ProgressContext';
-
-const SIMULATOR_QUESTIONS = interviewQuestions.slice(0, 10);
 
 function MetricBar({ label, value }) {
   return (
@@ -93,6 +91,7 @@ function FeedbackPanel({ feedback, onNext, isLast }) {
 }
 
 function SimulatorSession({ onComplete }) {
+  const [questions, setQuestions] = useState([]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answer, setAnswer] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -101,8 +100,16 @@ function SimulatorSession({ onComplete }) {
   const [listening, setListening] = useState(false);
   const [allScores, setAllScores] = useState([]);
 
-  const question = SIMULATOR_QUESTIONS[currentIdx];
-  const isLast = currentIdx === SIMULATOR_QUESTIONS.length - 1;
+  useEffect(() => {
+    async function load() {
+      const q = await api.getQuestions();
+      if (q && q.length > 0) setQuestions(q.slice(0, 10));
+    }
+    load();
+  }, []);
+
+  const question = questions[currentIdx] || { question: 'Tell me about yourself and why you want to become a cabin crew member.' };
+  const isLast = currentIdx === questions.length - 1;
 
   const toggleMic = () => {
     if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
@@ -149,13 +156,13 @@ function SimulatorSession({ onComplete }) {
     <div className="max-w-xl mx-auto">
       <div className="flex items-center gap-3 mb-8 bg-white p-4 rounded-2xl border border-aerora-border shadow-sm">
         <div className="flex-1 flex gap-1.5">
-          {SIMULATOR_QUESTIONS.map((_, i) => (
+          {(questions.length ? questions : Array.from({ length: 5 })).map((_, i) => (
             <div key={i} className={`flex-1 h-2 rounded-full transition-colors ${
               i < currentIdx ? 'bg-aerora-blue' : i === currentIdx ? 'bg-aerora-blue/40 animate-pulse' : 'bg-aerora-border'
             }`} />
           ))}
         </div>
-        <span className="text-xs font-extrabold text-aerora-blue font-mono">{currentIdx + 1}/{SIMULATOR_QUESTIONS.length}</span>
+        <span className="text-xs font-extrabold text-aerora-blue font-mono">{currentIdx + 1}/{questions.length || 5}</span>
       </div>
 
       <AnimatePresence mode="wait">

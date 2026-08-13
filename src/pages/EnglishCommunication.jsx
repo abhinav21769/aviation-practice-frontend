@@ -1,8 +1,14 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, ChevronRight, RotateCcw } from 'lucide-react';
-import { englishExercises as fallbackExercises, exerciseCategories } from '../data/englishExercises';
 import { api } from '../services/api';
+
+const exerciseCategories = [
+  { id: 'professionalise', label: 'Polite Transformations' },
+  { id: 'announcements', label: 'PA Announcements' },
+  { id: 'dialogues', label: 'Passenger Dialogues' },
+  { id: 'grammar', label: 'Aviation Grammar' },
+];
 
 function ProfessionaliseExercise({ exercise }) {
   const [attempt, setAttempt] = useState('');
@@ -211,7 +217,7 @@ function AnnouncementExercise({ exercise }) {
 export default function EnglishCommunication() {
   const [activeCategory, setActiveCategory] = useState('professionalise');
   const [selectedExercise, setSelectedExercise] = useState(null);
-  const [exercises, setExercises] = useState(fallbackExercises);
+  const [exercises, setExercises] = useState([]);
 
   useEffect(() => {
     async function loadExercises() {
