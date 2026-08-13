@@ -98,15 +98,12 @@ export default function AviationEnglish() {
   const [mode, setMode] = useState('browse');
   const [flashIdx, setFlashIdx] = useState(0);
   const [vocabulary, setVocabulary] = useState([]);
-  const [dailyWord, setDailyWord] = useState(null);
   const { state, dispatch } = useProgress();
 
   useEffect(() => {
     async function loadVocab() {
       const serverVocab = await api.getVocabulary();
       if (serverVocab) setVocabulary(serverVocab);
-      const serverDaily = await api.getDailyWord();
-      if (serverDaily) setDailyWord(serverDaily);
     }
     loadVocab();
   }, []);
@@ -130,17 +127,6 @@ export default function AviationEnglish() {
         <h1 className="text-3xl sm:text-4xl font-extrabold text-aerora-ink mb-2 font-heading">Vocabulary & Flashcards</h1>
         <p className="text-aerora-muted text-base font-medium mb-8 max-w-xl">Learn essential aviation terminology, aircraft jargon, and standard phraseology.</p>
       </motion.div>
-
-      {/* Daily Word */}
-      {dailyWord && (
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-aerora-ink rounded-3xl p-7 mb-8 text-white relative overflow-hidden shadow-md">
-          <p className="text-[11px] font-extrabold tracking-[0.2em] text-amber-400 uppercase mb-2">Featured Term of the Day</p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold mb-1 font-heading">{dailyWord.word}</h2>
-          <p className="text-white/60 text-xs font-bold italic mb-3">/{dailyWord.pronunciation}/</p>
-          <p className="text-sm font-semibold text-white/90 leading-relaxed max-w-lg mb-4">{dailyWord.definition}</p>
-          <p className="text-xs font-medium text-white/70 italic">"{dailyWord.exampleSentence}"</p>
-        </motion.div>
-      )}
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Sidebar */}
