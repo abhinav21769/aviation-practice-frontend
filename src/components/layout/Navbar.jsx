@@ -32,7 +32,7 @@ export default function Navbar() {
                 <Plane className="w-4.5 h-4.5 text-white -rotate-45" />
               </div>
               <span className="font-extrabold text-aerora-ink tracking-[0.16em] text-base uppercase font-heading">
-                AERORA
+                SKYREADY
               </span>
             </Link>
 
