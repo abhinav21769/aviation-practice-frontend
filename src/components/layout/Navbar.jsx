@@ -28,12 +28,17 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2.5 group">
-              <div className="w-8.5 h-8.5 bg-aerora-blue rounded-xl flex items-center justify-center shadow-sm group-hover:bg-aerora-ink transition-colors">
-                <Plane className="w-4.5 h-4.5 text-white -rotate-45" />
+              <div className="w-9 h-9 rounded-xl overflow-hidden shadow-sm border border-blue-900/30 group-hover:scale-105 transition-transform flex-shrink-0">
+                <img src="/icon.jpg" alt="SkyReady" className="w-full h-full object-cover" />
               </div>
-              <span className="font-extrabold text-aerora-ink tracking-[0.16em] text-base uppercase font-heading">
-                SKYREADY
-              </span>
+              <div className="flex flex-col">
+                <span className="font-extrabold text-aerora-ink tracking-[0.16em] text-base uppercase font-heading leading-none">
+                  SKYREADY
+                </span>
+                <span className="text-[9px] font-extrabold uppercase tracking-widest text-aerora-blue mt-0.5">
+                  Cabin Crew Prep
+                </span>
+              </div>
             </Link>
 
             {/* Desktop Nav */}
