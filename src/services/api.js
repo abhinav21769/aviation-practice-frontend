@@ -149,6 +149,14 @@ export const api = {
     return data?.progress || null;
   },
 
+  async saveScenarioResponse(scenarioId, selectedOption, isCorrect) {
+    const data = await fetchJson('/progress/scenario', {
+      method: 'POST',
+      body: JSON.stringify({ scenarioId, selectedOption, isCorrect }),
+    });
+    return data?.progress || null;
+  },
+
   async completeSimulatorSession(session) {
     const data = await fetchJson('/progress/simulator', {
       method: 'POST',

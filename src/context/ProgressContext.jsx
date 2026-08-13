@@ -88,15 +88,27 @@ function progressReducer(state, action) {
         },
       };
     }
+    case 'COMPLETE_SCENARIO':
     case 'RECORD_SCENARIO_ANSWER': {
-      const { scenarioId, selectedOption, isCorrect } = action.payload;
+      const payload = action.payload || action;
+      const { scenarioId, selectedOption, isCorrect } = payload;
       const responses = state.scenarioResponses || [];
       const existingIndex = responses.findIndex((r) => r.scenarioId === scenarioId);
       let updatedResponses = [...responses];
       if (existingIndex >= 0) {
-        updatedResponses[existingIndex] = { scenarioId, selectedOption, isCorrect, answeredAt: new Date() };
+        updatedResponses[existingIndex] = {
+          scenarioId,
+          selectedOption,
+          isCorrect: Boolean(isCorrect),
+          answeredAt: new Date(),
+        };
       } else {
-        updatedResponses.push({ scenarioId, selectedOption, isCorrect, answeredAt: new Date() });
+        updatedResponses.push({
+          scenarioId,
+          selectedOption,
+          isCorrect: Boolean(isCorrect),
+          answeredAt: new Date(),
+        });
       }
 
       const isNew = !state.completedScenarios.includes(scenarioId);

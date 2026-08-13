@@ -45,10 +45,12 @@ function ScenarioDetail({ scenario, onBack, onNext }) {
 
     // Dispatch locally and persist to MongoDB
     dispatch({
-      type: 'COMPLETE_SCENARIO',
-      scenarioId: scenario.id,
-      selectedOption: optionId,
-      isCorrect,
+      type: 'RECORD_SCENARIO_ANSWER',
+      payload: {
+        scenarioId: scenario.id,
+        selectedOption: optionId,
+        isCorrect,
+      },
     });
 
     try {
@@ -405,7 +407,8 @@ export default function Scenarios() {
             <div className="space-y-3.5">
               {filteredScenarios.map((scenario) => {
                 const userResp = (state.scenarioResponses || []).find((r) => r.scenarioId === scenario.id);
-                const isDone = state.completedScenarios.includes(scenario.id);
+                const isDone = (state.completedScenarios || []).includes(scenario.id) || !!userResp;
+                const isCorrectAnswer = userResp?.isCorrect === true || (userResp?.selectedOption && userResp.selectedOption === scenario.bestAnswer);
 
                 return (
                   <motion.div
@@ -426,9 +429,9 @@ export default function Scenarios() {
                         <span className="text-xs font-bold text-aerora-muted">{scenarioCategories.find(c => c.id === scenario.category)?.label || 'General'}</span>
                         {isDone && (
                           <span className={`text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wide ${
-                            userResp?.isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                            isCorrectAnswer ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
                           }`}>
-                            {userResp?.isCorrect ? '✓ Completed (Correct)' : '✓ Practiced'}
+                            {isCorrectAnswer ? '✓ Completed (Correct)' : '✓ Practiced'}
                           </span>
                         )}
                       </div>
