@@ -93,25 +93,38 @@ function getWordImage(word) {
 
 function WordCard({ word, isSaved, onSave, onLearn }) {
   const imageUrl = getWordImage(word);
+  const googleImagesUrl = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(word.word + ' cabin crew aircraft aviation')}`;
+  const wikimediaUrl = `https://commons.wikimedia.org/w/index.php?search=${encodeURIComponent(word.word + ' aviation')}`;
 
   return (
     <div className="max-w-xl bg-white p-6 rounded-3xl border-2 border-aerora-border shadow-md">
-      {/* Visual Image Representation */}
-      <div className="relative rounded-2xl overflow-hidden mb-6 h-52 sm:h-60 bg-aerora-bg border border-aerora-border/50">
+      {/* Visual Image Representation with Quick Search Button */}
+      <div className="relative rounded-2xl overflow-hidden mb-6 h-56 sm:h-64 bg-aerora-bg border border-aerora-border/50 group">
         <img
           src={imageUrl}
           alt={word.word}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex flex-col justify-end p-4 text-white">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-between p-4 text-white">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-extrabold uppercase tracking-wider bg-white/20 backdrop-blur-md px-3 py-1 rounded-full border border-white/20">
               {word.category?.replace('_', ' ')}
             </span>
-            <span className="text-xs font-semibold text-white/90">
-              Visual Reference Guide
-            </span>
+            <a
+              href={googleImagesUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-bold bg-white text-aerora-ink px-3 py-1.5 rounded-xl hover:bg-aerora-blue hover:text-white transition-all shadow-md"
+            >
+              <Search className="w-3.5 h-3.5" />
+              <span>Google Images ↗</span>
+            </a>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-bold text-white/90">Visual Cabin Guide</p>
+            <p className="text-[11px] text-white/70">Click button above for 100+ live photos</p>
           </div>
         </div>
       </div>
@@ -133,6 +146,28 @@ function WordCard({ word, isSaved, onSave, onLearn }) {
             : <Bookmark className="w-5 h-5 text-aerora-muted" />
           }
         </button>
+      </div>
+
+      {/* External Search Links */}
+      <div className="flex flex-wrap gap-2.5 mb-6">
+        <a
+          href={googleImagesUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-aerora-blue text-white rounded-xl text-xs font-extrabold shadow-sm hover:bg-aerora-blue/90 transition-all"
+        >
+          <Search className="w-4 h-4" />
+          <span>Search Photos on Google Images ↗</span>
+        </a>
+        <a
+          href={wikimediaUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-aerora-bg text-aerora-ink rounded-xl text-xs font-bold border border-aerora-border hover:border-aerora-blue hover:text-aerora-blue transition-all"
+        >
+          <BookOpen className="w-3.5 h-3.5" />
+          <span>Diagrams ↗</span>
+        </a>
       </div>
 
       <div className="space-y-4 mb-8">
@@ -342,6 +377,16 @@ export default function AviationEnglish() {
                         </div>
 
                         <div className="flex items-center gap-1.5 flex-shrink-0">
+                          <a
+                            href={`https://www.google.com/search?tbm=isch&q=${encodeURIComponent(word.word + ' cabin crew aircraft aviation')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            title={`Search real photos of ${word.word} on Google Images`}
+                            className="p-1.5 text-aerora-muted hover:text-aerora-blue hover:bg-aerora-blueLight rounded-lg transition-colors"
+                          >
+                            <Search className="w-3.5 h-3.5" />
+                          </a>
                           {isSaved && <BookmarkCheck className="w-4 h-4 text-aerora-blue fill-aerora-blue/20" />}
                           <ChevronRight className="w-4 h-4 text-aerora-border group-hover:text-aerora-blue group-hover:translate-x-0.5 transition-all" />
                         </div>
