@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useProgress } from '../context/ProgressContext';
+import AviationLoader, { CardSkeleton } from '../components/shared/AviationLoader';
 
 const scenarioCategories = [
   { id: 'medical', label: 'Medical Emergencies' },
@@ -321,12 +322,15 @@ export default function Scenarios() {
   const [activeCategory, setActiveCategory] = useState(null);
   const [selectedScenario, setSelectedScenario] = useState(null);
   const [scenarios, setScenarios] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { state } = useProgress();
 
   useEffect(() => {
     async function loadScenarios() {
+      setLoading(true);
       const serverScenarios = await api.getScenarios();
       if (serverScenarios) setScenarios(serverScenarios);
+      setLoading(false);
     }
     loadScenarios();
   }, []);
@@ -404,45 +408,52 @@ export default function Scenarios() {
               </p>
             </div>
 
-            <div className="space-y-3.5">
-              {filteredScenarios.map((scenario) => {
-                const userResp = (state.scenarioResponses || []).find((r) => r.scenarioId === scenario.id);
-                const isDone = (state.completedScenarios || []).includes(scenario.id) || !!userResp;
-                const isCorrectAnswer = userResp?.isCorrect === true || (userResp?.selectedOption && userResp.selectedOption === scenario.bestAnswer);
+            {loading ? (
+              <div className="space-y-4">
+                <AviationLoader message="Loading cabin crew situational judgment scenarios..." size="sm" />
+                <CardSkeleton count={5} />
+              </div>
+            ) : (
+              <div className="space-y-3.5">
+                {filteredScenarios.map((scenario) => {
+                  const userResp = (state.scenarioResponses || []).find((r) => r.scenarioId === scenario.id);
+                  const isDone = (state.completedScenarios || []).includes(scenario.id) || !!userResp;
+                  const isCorrectAnswer = userResp?.isCorrect === true || (userResp?.selectedOption && userResp.selectedOption === scenario.bestAnswer);
 
-                return (
-                  <motion.div
-                    key={scenario.id}
-                    onClick={() => {
-                      setSelectedScenario(scenario);
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                    className="group bg-white rounded-2xl border-2 border-aerora-border p-5 hover:border-aerora-blue hover:shadow-md transition-all duration-300 cursor-pointer flex items-center justify-between gap-4"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className={`text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wide border ${
-                          scenario.difficulty === 'easy' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                          scenario.difficulty === 'medium' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                          'bg-rose-50 text-rose-700 border-rose-200'
-                        }`}>{scenario.difficulty}</span>
-                        <span className="text-xs font-bold text-aerora-muted">{scenarioCategories.find(c => c.id === scenario.category)?.label || 'General'}</span>
-                        {isDone && (
-                          <span className={`text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wide ${
-                            isCorrectAnswer ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
-                          }`}>
-                            {isCorrectAnswer ? '✓ Completed (Correct)' : '✓ Practiced'}
-                          </span>
-                        )}
+                  return (
+                    <motion.div
+                      key={scenario.id}
+                      onClick={() => {
+                        setSelectedScenario(scenario);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="group bg-white rounded-2xl border-2 border-aerora-border p-5 hover:border-aerora-blue hover:shadow-md transition-all duration-300 cursor-pointer flex items-center justify-between gap-4"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className={`text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wide border ${
+                            scenario.difficulty === 'easy' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                            scenario.difficulty === 'medium' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                            'bg-rose-50 text-rose-700 border-rose-200'
+                          }`}>{scenario.difficulty}</span>
+                          <span className="text-xs font-bold text-aerora-muted">{scenarioCategories.find(c => c.id === scenario.category)?.label || 'General'}</span>
+                          {isDone && (
+                            <span className={`text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wide ${
+                              isCorrectAnswer ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                            }`}>
+                              {isCorrectAnswer ? '✓ Completed (Correct)' : '✓ Practiced'}
+                            </span>
+                          )}
+                        </div>
+                        <h3 className="text-base font-extrabold text-aerora-ink group-hover:text-aerora-blue transition-colors font-heading mb-1">{scenario.title}</h3>
+                        <p className="text-sm font-semibold text-aerora-muted line-clamp-2 leading-relaxed">{scenario.situation}</p>
                       </div>
-                      <h3 className="text-base font-extrabold text-aerora-ink group-hover:text-aerora-blue transition-colors font-heading mb-1">{scenario.title}</h3>
-                      <p className="text-sm font-semibold text-aerora-muted line-clamp-2 leading-relaxed">{scenario.situation}</p>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-aerora-muted group-hover:text-aerora-blue group-hover:translate-x-1 transition-all flex-shrink-0" />
-                  </motion.div>
-                );
-              })}
-            </div>
+                      <ChevronRight className="w-5 h-5 text-aerora-muted group-hover:text-aerora-blue group-hover:translate-x-1 transition-all flex-shrink-0" />
+                    </motion.div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       )}

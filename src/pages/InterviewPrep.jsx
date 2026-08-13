@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, BookOpen, CheckCircle2, RotateCcw, Star, Sparkles, Plane } from 'lucide-react';
+import { ChevronRight, BookOpen, CheckCircle2, RotateCcw, Star, Sparkles, Plane, ArrowLeft, Send } from 'lucide-react';
 import { api } from '../services/api';
 import { useProgress } from '../context/ProgressContext';
+import AviationLoader, { CardSkeleton } from '../components/shared/AviationLoader';
 
 const questionCategories = [
   { id: 'personal', label: 'Personal' },
@@ -218,12 +219,6 @@ function QuestionDetail({ question, onBack, onNext }) {
           </button>
         )}
       </div>
-
-      {submitted && (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mt-4 flex items-center gap-2 text-emerald-800 font-bold text-sm bg-emerald-50 p-3 rounded-xl border border-emerald-300">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Answer saved successfully!
-        </motion.div>
-      )}
     </motion.div>
   );
 }
@@ -234,15 +229,18 @@ export default function InterviewPrep() {
   const [search, setSearch] = useState('');
   const [selectedAirline, setSelectedAirline] = useState('Emirates');
   const [generating, setGenerating] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState([]);
   const { state } = useProgress();
 
   useEffect(() => {
     async function loadQuestions() {
+      setLoading(true);
       const serverQuestions = await api.getQuestions();
       if (serverQuestions && serverQuestions.length > 0) {
         setQuestions(serverQuestions);
       }
+      setLoading(false);
     }
     loadQuestions();
   }, []);
@@ -353,6 +351,11 @@ export default function InterviewPrep() {
                 onBack={() => setSelectedQuestion(null)}
                 onNext={selectedIdx < categoryQuestions.length - 1 ? () => setSelectedQuestion(categoryQuestions[selectedIdx + 1]) : null}
               />
+            ) : loading ? (
+              <div className="space-y-4">
+                <AviationLoader message="Loading cabin crew interview questions..." size="sm" />
+                <CardSkeleton count={5} />
+              </div>
             ) : (
               <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <p className="text-xs font-bold text-aerora-muted uppercase tracking-wider mb-4">{categoryQuestions.length} questions in {questionCategories.find(c => c.id === activeCategory)?.label}</p>

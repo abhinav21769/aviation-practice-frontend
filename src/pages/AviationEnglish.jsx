@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronLeft, CheckCircle2, ExternalLink, Image as ImageIcon, Loader2, ArrowLeft } from 'lucide-react';
 import { api } from '../services/api';
 import { useProgress } from '../context/ProgressContext';
+import AviationLoader, { GridSkeleton } from '../components/shared/AviationLoader';
 
 const vocabularyCategories = [
   { id: 'all', label: 'All Terms' },
@@ -235,15 +236,18 @@ function WordDetailView({ word, isLearned, onLearn, onNext, onPrev, hasNext, has
 export default function AviationEnglish() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedWord, setSelectedWord] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [vocabulary, setVocabulary] = useState([]);
   const { state, dispatch } = useProgress();
 
   useEffect(() => {
     async function loadVocab() {
+      setLoading(true);
       const serverVocab = await api.getVocabulary();
       if (serverVocab && serverVocab.length > 0) {
         setVocabulary(serverVocab);
       }
+      setLoading(false);
     }
     loadVocab();
   }, []);
@@ -344,7 +348,13 @@ export default function AviationEnglish() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {loading ? (
+              <div className="space-y-4">
+                <AviationLoader message="Loading cabin crew aviation vocabulary..." size="sm" />
+                <GridSkeleton count={8} />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               {categoryWords.map((word, i) => {
                 const isLearned = (state.savedWords || []).includes(word.id);
 
@@ -388,6 +398,7 @@ export default function AviationEnglish() {
                 );
               })}
             </div>
+            )}
           </div>
         </div>
       )}
