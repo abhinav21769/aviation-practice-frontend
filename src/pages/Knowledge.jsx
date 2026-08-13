@@ -76,7 +76,7 @@ export default function Knowledge() {
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
         <p className="text-[11px] font-extrabold tracking-[0.2em] text-aerora-blue uppercase mb-2">Knowledge Hub</p>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-aerora-ink mb-2 font-heading">Cabin Crew Knowledge</h1>
-        <p className="text-aerora-muted text-base font-medium mb-8 max-w-xl">Essential aircraft, safety, and operational knowledge served via Express REST API.</p>
+        <p className="text-aerora-muted text-base font-medium mb-8 max-w-xl">Comprehensive reference on aircraft types, safety equipment, regulations, and airline service standards.</p>
       </motion.div>
 
       <div className="flex flex-col lg:flex-row gap-8">

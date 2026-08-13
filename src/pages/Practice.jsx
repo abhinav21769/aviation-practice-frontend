@@ -32,7 +32,7 @@ function FeedbackPanel({ feedback, onNext, isLast }) {
           <span className="text-2xl font-extrabold text-aerora-blue font-heading">{feedback.overallScore}%</span>
         </div>
         <div>
-          <p className="text-base font-extrabold text-aerora-ink font-heading">AI Backend Evaluation Score</p>
+          <p className="text-base font-extrabold text-aerora-ink font-heading">AI Performance Score</p>
           <p className="text-xs font-bold text-aerora-muted">
             {feedback.overallScore >= 80 ? '🌟 Exceptional cabin-crew quality answer!' : feedback.overallScore >= 65 ? '👍 Good progress. Solid core structure.' : '💡 Practice more with the STAR framework.'}
           </p>
@@ -190,7 +190,7 @@ function SimulatorSession({ onComplete }) {
                 disabled={!answer.trim() || loading}
                 className="flex-1 bg-aerora-blue text-white py-3.5 rounded-xl text-sm font-bold tracking-wide disabled:opacity-40 hover:bg-aerora-blue/90 transition-colors shadow-sm"
               >
-                {loading ? 'Evaluating via Express Backend...' : 'Submit Answer for AI Scoring'}
+                {loading ? 'Evaluating your response...' : 'Submit Answer for AI Scoring'}
               </button>
               <button
                 onClick={toggleMic}
@@ -221,7 +221,7 @@ function ResultsSummary({ scores, onRestart }) {
       </div>
       <h2 className="text-3xl font-extrabold text-aerora-ink mb-2 font-heading">Mock Interview Completed</h2>
       <p className="text-aerora-muted text-sm font-medium mb-8">
-        Answered <strong className="text-aerora-ink">{scores.length} questions</strong>. Overall REST API score: <strong className="text-aerora-blue">{avg}%</strong>.
+        Answered <strong className="text-aerora-ink">{scores.length} questions</strong>. Overall readiness score: <strong className="text-aerora-blue">{avg}%</strong>.
       </p>
       <button onClick={onRestart} className="w-full flex items-center justify-center gap-2 bg-aerora-blue text-white py-3.5 rounded-xl text-sm font-bold tracking-wide hover:bg-aerora-blue/90 transition-colors shadow-md">
         <RotateCcw className="w-4 h-4" /> Start New Practice Session
@@ -257,7 +257,7 @@ export default function Practice() {
             Your Interview <span className="text-aerora-blue">Starts Now.</span>
           </h1>
           <p className="text-aerora-muted text-base font-medium mb-10 max-w-md leading-relaxed">
-            Answer 10 real questions and get scored live via Express REST API.
+            Answer 10 real-world interview questions and receive detailed AI feedback on communication, structure, and professionalism.
           </p>
 
           <div className="flex gap-3">

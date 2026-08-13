@@ -53,7 +53,7 @@ function ProfessionaliseExercise({ exercise }) {
         disabled={!attempt.trim() || loading}
         className="mb-6 px-6 py-3 bg-aerora-blue text-white rounded-xl text-sm font-bold tracking-wide disabled:opacity-40 hover:bg-aerora-blue/90 transition-colors shadow-sm"
       >
-        {loading ? 'Evaluating via Backend API...' : 'Evaluate Professional Tone'}
+        {loading ? 'Analyzing your response...' : 'Evaluate Professional Tone'}
       </button>
 
       <AnimatePresence>
@@ -137,7 +137,7 @@ function PassengerResponseExercise({ exercise }) {
         disabled={!response.trim() || loading}
         className="mb-6 px-6 py-3 bg-aerora-blue text-white rounded-xl text-sm font-bold tracking-wide disabled:opacity-40 hover:bg-aerora-blue/90 transition-colors shadow-sm"
       >
-        {loading ? 'Evaluating via Backend API...' : 'Evaluate Passenger Response'}
+        {loading ? 'Analyzing your response...' : 'Evaluate Passenger Response'}
       </button>
 
       <AnimatePresence>

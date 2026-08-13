@@ -267,7 +267,7 @@ export default function Scenarios() {
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
         <p className="text-[11px] font-extrabold tracking-[0.2em] text-aerora-blue uppercase mb-2">Practice</p>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-aerora-ink mb-2 font-heading">Situational Judgment</h1>
-        <p className="text-aerora-muted text-base font-medium mb-8 max-w-xl">50+ realistic in-flight scenarios with real-time answer verification via MongoDB Atlas.</p>
+        <p className="text-aerora-muted text-base font-medium mb-8 max-w-xl">Practice handling real cabin crew situations with instant feedback and best-practice explanations.</p>
       </motion.div>
 
       <div className="flex flex-col lg:flex-row gap-8">

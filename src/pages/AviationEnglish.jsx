@@ -128,7 +128,7 @@ export default function AviationEnglish() {
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
         <p className="text-[11px] font-extrabold tracking-[0.2em] text-aerora-blue uppercase mb-2">Aviation English</p>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-aerora-ink mb-2 font-heading">Vocabulary & Flashcards</h1>
-        <p className="text-aerora-muted text-base font-medium mb-8 max-w-xl">Master 100+ aviation terms served via Express REST API.</p>
+        <p className="text-aerora-muted text-base font-medium mb-8 max-w-xl">Learn essential aviation terminology, aircraft jargon, and standard phraseology.</p>
       </motion.div>
 
       {/* Daily Word */}

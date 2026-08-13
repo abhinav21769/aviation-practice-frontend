@@ -141,7 +141,7 @@ function QuestionDetail({ question, onBack, onNext }) {
 
       {submitted && (
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mt-4 flex items-center gap-2 text-aerora-green font-bold text-sm bg-aerora-greenLight p-3 rounded-xl border border-aerora-green/30">
-          <CheckCircle2 className="w-4 h-4" /> Answer logged to backend!
+          <CheckCircle2 className="w-4 h-4" /> Answer saved successfully!
         </motion.div>
       )}
     </motion.div>
@@ -191,7 +191,7 @@ export default function InterviewPrep() {
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <p className="text-[11px] font-extrabold tracking-[0.2em] text-aerora-blue uppercase mb-2">Preparation</p>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-aerora-ink mb-2 font-heading">Interview Preparation</h1>
-        <p className="text-aerora-muted text-base font-medium mb-8 max-w-xl">Practice 100+ curated questions & generate custom AI prompts via Express REST API.</p>
+        <p className="text-aerora-muted text-base font-medium mb-8 max-w-xl">Master HR, behavioral, and airline-specific interview questions tailored for cabin crew aspirants.</p>
       </motion.div>
 
       {/* AI Airline Prompt Generator Banner */}
@@ -202,7 +202,7 @@ export default function InterviewPrep() {
               <Sparkles className="w-4 h-4" /> AI Airline Generator
             </div>
             <h3 className="text-xl font-extrabold font-heading mb-1">Targeting a specific airline?</h3>
-            <p className="text-xs text-white/80 font-medium">Generate real AI interview questions via backend REST API.</p>
+            <p className="text-xs text-white/80 font-medium">Generate realistic practice questions tailored to your chosen airline.</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
