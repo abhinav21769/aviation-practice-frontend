@@ -274,11 +274,13 @@ export default function AviationEnglish() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-        <p className="text-[11px] font-extrabold tracking-[0.2em] text-aerora-blue uppercase mb-2">Aviation English</p>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-aerora-ink mb-2 font-heading">Aviation Vocabulary & Visual Guide</h1>
-        <p className="text-aerora-muted text-base font-medium max-w-xl">Explore essential aviation terms with live internet visual references.</p>
-      </motion.div>
+      {!selectedWord && (
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+          <p className="text-[11px] font-extrabold tracking-[0.2em] text-aerora-blue uppercase mb-2">Aviation English</p>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-aerora-ink mb-2 font-heading">Aviation Vocabulary & Visual Guide</h1>
+          <p className="text-aerora-muted text-base font-medium max-w-xl">Explore essential aviation terms with live internet visual references.</p>
+        </motion.div>
+      )}
 
       {selectedWord ? (
         <AnimatePresence mode="wait">
