@@ -21,8 +21,9 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Manrope', 'system-ui', 'sans-serif'],
-        heading: ['Manrope', 'Outfit', 'sans-serif'],
+        sans: ['Manrope', 'sans-serif'],
+        heading: ['Manrope', 'sans-serif'],
+        mono: ['Manrope', 'sans-serif'],
       },
       fontSize: {
         '2xs': ['0.65rem', { lineHeight: '1rem' }],

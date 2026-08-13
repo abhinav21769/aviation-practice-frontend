@@ -3,25 +3,28 @@
 @tailwind utilities;
 
 @layer base {
-  * {
+  *, ::before, ::after {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
+    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 
   body {
-    @apply bg-aerora-bg text-aerora-ink font-sans;
+    @apply bg-aerora-bg text-aerora-ink;
+    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-feature-settings: 'kern' 1, 'liga' 1, 'cv05' 1;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: Manrope, sans-serif;
-    letter-spacing: -0.025em;
+  h1, h2, h3, h4, h5, h6, p, span, button, input, textarea, select, a, div {
+    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    letter-spacing: -0.02em;
   }
 
   ::selection {
