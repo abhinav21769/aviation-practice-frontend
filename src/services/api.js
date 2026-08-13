@@ -59,6 +59,26 @@ export const api = {
     return data?.dailyWord || null;
   },
 
+  async fetchWordImages(word) {
+    try {
+      const query = encodeURIComponent(`${word} aviation`);
+      const wikiUrl = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrsearch=${query}&gsrlimit=6&prop=imageinfo&iiprop=url|thumburl&iiurlwidth=600&format=json&origin=*`;
+      const res = await fetch(wikiUrl);
+      if (res.ok) {
+        const data = await res.json();
+        const pages = data?.query?.pages || {};
+        const images = Object.values(pages)
+          .map((p) => p.imageinfo?.[0]?.thumburl || p.imageinfo?.[0]?.url)
+          .filter((u) => u && !u.includes('.pdf') && !u.includes('.tif') && !u.includes('.ogg') && !u.includes('.ogv') && !u.includes('.svg.png'));
+        if (images.length > 0) return images;
+      }
+      const backendData = await fetchJson(`/vocabulary/images?word=${encodeURIComponent(word)}`);
+      return backendData?.images || [];
+    } catch (err) {
+      return [];
+    }
+  },
+
   // Scenarios
   async getScenarios(category = null) {
     const params = new URLSearchParams();
