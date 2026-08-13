@@ -1,10 +1,12 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, Globe, BookMarked, Mic2, Star, Brain, Calendar, TrendingUp, Award } from 'lucide-react';
+import { BookOpen, Globe, BookMarked, Mic2, Star, Brain, Calendar, TrendingUp, Award, RotateCcw } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip,
   RadarChart, PolarGrid, PolarAngleAxis, Radar,
 } from 'recharts';
 import { useProgress } from '../context/ProgressContext';
+import { api } from '../services/api';
 
 const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -27,7 +29,21 @@ const categoryLabels = {
 };
 
 export default function Progress() {
-  const { state } = useProgress();
+  const { state, dispatch } = useProgress();
+  const [resetting, setResetting] = useState(false);
+
+  const handleReset = async () => {
+    if (!window.confirm('Are you sure you want to reset all preparation progress to 0%? This will clear answered questions, scenarios, and words.')) return;
+    setResetting(true);
+    try {
+      await api.resetProgress();
+      dispatch({ type: 'RESET_PROGRESS' });
+    } catch (err) {
+      console.error('Reset failed:', err);
+    } finally {
+      setResetting(false);
+    }
+  };
 
   const weeklyData = state.weeklyProgress.map((mins, i) => ({ day: days[i], mins }));
   const radarData = Object.entries(state.categoryProgress).map(([k, v]) => ({
@@ -55,9 +71,20 @@ export default function Progress() {
             <h1 className="text-3xl sm:text-4xl font-extrabold text-aerora-ink font-heading">Preparation Dashboard</h1>
             <p className="text-aerora-muted text-sm font-medium">Track your skill balance and weekly consistency.</p>
           </div>
-          <div className="flex items-center gap-3 bg-white p-3.5 rounded-2xl border-2 border-aerora-border shadow-sm">
-            <div className="text-4xl font-extrabold text-aerora-blue font-heading leading-none">{state.overallProgress}%</div>
-            <div className="text-xs font-bold text-aerora-muted uppercase tracking-wider">Overall<br />Ready Score</div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleReset}
+              disabled={resetting}
+              className="flex items-center gap-1.5 px-3.5 py-3 rounded-2xl border-2 border-aerora-border text-aerora-muted hover:text-rose-600 hover:border-rose-300 hover:bg-rose-50 transition-all text-xs font-bold shadow-sm"
+              title="Reset all progress to 0%"
+            >
+              <RotateCcw className={`w-3.5 h-3.5 ${resetting ? 'animate-spin' : ''}`} />
+              <span>{resetting ? 'Resetting...' : 'Reset Progress'}</span>
+            </button>
+            <div className="flex items-center gap-3 bg-white p-3.5 rounded-2xl border-2 border-aerora-border shadow-sm">
+              <div className="text-4xl font-extrabold text-aerora-blue font-heading leading-none">{state.overallProgress}%</div>
+              <div className="text-xs font-bold text-aerora-muted uppercase tracking-wider">Overall<br />Ready Score</div>
+            </div>
           </div>
         </div>
       </motion.div>

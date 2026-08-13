@@ -115,6 +115,15 @@
   padding-bottom: env(safe-area-inset-bottom, 8px);
 }
 
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.animate-heartbeat {
+  animation: heartbeat 1.2s ease-in-out infinite;
+}
+
 /* Smooth focus rings */
 button:focus-visible,
 a:focus-visible,

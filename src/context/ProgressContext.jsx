@@ -41,6 +41,10 @@ const initialState = {
 
 function progressReducer(state, action) {
   switch (action.type) {
+    case 'RESET_PROGRESS': {
+      localStorage.removeItem(STORAGE_KEY);
+      return { ...initialState };
+    }
     case 'TOGGLE_TASK': {
       const updatedTasks = state.todayTasks.map((t) =>
         t.id === action.taskId ? { ...t, completed: !t.completed } : t

@@ -111,9 +111,14 @@ export const api = {
     return data?.topics || null;
   },
 
-  // Progress State (Nishtha's Progress)
+  // Progress State
   async getProgress() {
     const data = await fetchJson('/progress');
+    return data?.progress || null;
+  },
+
+  async resetProgress() {
+    const data = await fetchJson('/progress/reset', { method: 'POST' });
     return data?.progress || null;
   },
 
