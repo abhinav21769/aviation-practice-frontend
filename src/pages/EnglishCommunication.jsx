@@ -5,8 +5,8 @@ import { api } from '../services/api';
 
 const exerciseCategories = [
   { id: 'professionalise', label: 'Polite Transformations' },
+  { id: 'passenger_response', label: 'Passenger Responses' },
   { id: 'announcements', label: 'PA Announcements' },
-  { id: 'dialogues', label: 'Passenger Dialogues' },
   { id: 'grammar', label: 'Aviation Grammar' },
 ];
 

@@ -5,13 +5,13 @@ import { api } from '../services/api';
 import { useProgress } from '../context/ProgressContext';
 
 const scenarioCategories = [
-  { id: 'disruptive_passengers', label: 'Disruptive Passengers' },
-  { id: 'medical_emergencies', label: 'Medical Emergencies' },
-  { id: 'safety_violations', label: 'Safety Violations' },
-  { id: 'service_recovery', label: 'Service Recovery' },
+  { id: 'difficult_passengers', label: 'Difficult Passengers' },
+  { id: 'service', label: 'Service Recovery' },
+  { id: 'medical', label: 'Medical Emergencies' },
   { id: 'special_needs', label: 'Special Needs' },
-  { id: 'team_coordination', label: 'Team Coordination' },
-  { id: 'irregular_operations', label: 'Irregular Operations' },
+  { id: 'conflict', label: 'Passenger Conflicts' },
+  { id: 'delays', label: 'Delays & Operations' },
+  { id: 'emergency', label: 'Safety & Emergency' },
 ];
 
 function ScenarioDetail({ scenario, onBack, onNext }) {

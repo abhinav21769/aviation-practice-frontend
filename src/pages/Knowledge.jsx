@@ -4,11 +4,11 @@ import { ChevronRight } from 'lucide-react';
 import { api } from '../services/api';
 
 const knowledgeCategories = [
-  { id: 'airline_profiles', label: 'Airline Profiles' },
-  { id: 'aircraft_types', label: 'Aircraft Types' },
-  { id: 'safety_systems', label: 'Safety Systems' },
-  { id: 'grooming_standards', label: 'Grooming Standards' },
-  { id: 'service_procedures', label: 'Service Procedures' },
+  { id: 'aircraft', label: 'Aircraft Types' },
+  { id: 'safety', label: 'Safety Systems' },
+  { id: 'service', label: 'Service Procedures' },
+  { id: 'operations', label: 'Flight Operations' },
+  { id: 'regulations', label: 'Aviation Regulations' },
 ];
 
 function TopicDetail({ topic, onBack }) {

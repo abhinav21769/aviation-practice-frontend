@@ -5,14 +5,14 @@ import { api } from '../services/api';
 import { useProgress } from '../context/ProgressContext';
 
 const vocabularyCategories = [
-  { id: 'airport', label: 'Airport' },
   { id: 'aircraft', label: 'Aircraft' },
+  { id: 'airport', label: 'Airport' },
   { id: 'cabin', label: 'Cabin' },
-  { id: 'safety', label: 'Safety' },
   { id: 'service', label: 'Service' },
-  { id: 'communication', label: 'Communication' },
-  { id: 'medical', label: 'Medical' },
-  { id: 'weather', label: 'Weather' },
+  { id: 'safety', label: 'Safety' },
+  { id: 'emergency', label: 'Emergency' },
+  { id: 'operations', label: 'Operations' },
+  { id: 'announcements', label: 'Announcements' },
 ];
 
 function WordCard({ word, isSaved, onSave, onLearn }) {

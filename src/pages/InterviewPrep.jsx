@@ -8,10 +8,9 @@ const questionCategories = [
   { id: 'personal', label: 'Personal' },
   { id: 'customer_service', label: 'Customer Service' },
   { id: 'teamwork', label: 'Teamwork' },
-  { id: 'conflict_resolution', label: 'Conflict Resolution' },
-  { id: 'safety_emergency', label: 'Safety & Emergency' },
-  { id: 'airline_specific', label: 'Airline-Specific' },
-  { id: 'cultural_awareness', label: 'Cultural Awareness' },
+  { id: 'behavioral', label: 'Behavioral' },
+  { id: 'pressure', label: 'Handling Pressure' },
+  { id: 'airline', label: 'Airline-Specific' },
 ];
 
 const AIRLINES = ['Emirates', 'Qatar Airways', 'Singapore Airlines', 'Delta Air Lines', 'British Airways'];
